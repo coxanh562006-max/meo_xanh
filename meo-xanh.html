@@ -244,6 +244,13 @@
   .calgrid .sun{color:#d9534f}
   .calgrid .studied{background:var(--soft);color:var(--primary);font-weight:700}
   .calgrid .today{background:#222;color:#fff;font-weight:700}
+  .filelink{cursor:pointer;min-height:0;font:inherit;color:var(--ink)}
+  .filelink:hover{border-color:var(--blue-d);color:var(--primary)}
+  .docprev{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px;max-height:72vh;overflow:auto;line-height:1.6}
+  .docprev table,.xlprev table{border-collapse:collapse;width:100%;font-size:14px}
+  .docprev td,.docprev th,.xlprev td,.xlprev th{border:1px solid var(--line);padding:6px 8px}
+  .xlprev{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;overflow:auto;max-height:72vh;margin-bottom:16px}
+  .txtprev{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;white-space:pre-wrap;max-height:72vh;overflow:auto;font-family:inherit}
   .kindrow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}
   .kindrow:last-of-type{border-bottom:0}
   .kindrow input{width:18px;height:18px;min-height:0;accent-color:var(--primary)}
@@ -911,7 +918,7 @@ function renderLesson(main, r){
         <button class="ghost" data-act="delLesson" data-id="${l.id}">Xóa bài</button>`;
   const known = l.words.filter(w => lvl(w.id) === 2).length;
   const primary = m.flash ? 'flash' : m.write ? 'write' : m.quiz ? 'quiz' : 'overview';
-  const fileNames = Object.entries(l.files || {}).map(([k, v]) => `<span class="file">${esc(v)}</span>`).join('');
+  const fileNames = Object.entries(l.files || {}).map(([k, v]) => `<button class="file filelink" data-act="dlFile" data-id="${l.id}" data-v="${k}" title="Tải về">${esc(v)} ⬇</button>`).join('');
   let body = '';
   if(r.tab === 'overview') body = overviewView(l);
   else if(r.tab === 'flash') body = flashBody(l.words.map(w => ({w, l})), l.name);
@@ -968,12 +975,11 @@ function overviewView(l){
           <div class="track"><div class="fill ok" style="width:${pct}%"></div></div>
         </div>
         <div class="card" style="margin-top:14px">
-          <h2>Ghi chú & mẫu câu</h2>
+          <h2>Ghi chú</h2>
           ${notes.length ? notes.map(n => `<div class="note"><div>${esc(n.text)}</div></div>`).join('')
             : '<p class="meta">Chưa có ghi chú. Thêm trong mục Sổ từ của tôi.</p>'}
           <div class="row" style="margin-top:14px">
             <a class="btn ghost" href="#/notes">Mở sổ từ</a>
-            <button class="ghost" data-act="attach" data-id="${l.id}">Đính kèm file</button>
           </div>
         </div>
       </div>
@@ -997,6 +1003,7 @@ function bindOverview(l){
         <td>${w.vi ? esc(w.vi) : '<span class="meta">chưa có nghĩa</span>'}</td>
         <td>${status(w)}</td>
         <td class="acts">
+          <button class="icon" data-act="saveNote" data-id="${w.id}" aria-label="Lưu vào sổ từ" title="Lưu vào sổ từ">${state.notes.some(n => n.wordId === w.id) ? '★' : '☆'}</button>
           <button class="icon" data-act="editWord" data-id="${w.id}" data-lesson="${l.id}" aria-label="Sửa từ">✎</button>
           <button class="icon" data-act="delWord" data-id="${w.id}" data-lesson="${l.id}" aria-label="Xóa từ">🗑</button>
         </td></tr>`).join('')}</tbody></table>
@@ -1089,10 +1096,17 @@ function saveNote(wordId){
   const owner = state.lessons.find(l => l.words.some(w => w.id === wordId)) || findLesson(route().id);
   const w = owner && owner.words.find(x => x.id === wordId);
   if(!w) return;
-  if(state.notes.some(n => n.wordId === wordId)){ toast('Từ này đã có trong sổ từ'); return; }
-  state.notes.unshift({id: 'N' + Date.now().toString(36), kind: 'word', wordId, lessonId: owner.id, ko: w.ko, vi: w.vi, text: '', at: Date.now()});
-  save();
-  toast('Đã lưu vào sổ từ');
+  const saved = state.notes.findIndex(n => n.wordId === wordId);
+  if(saved >= 0){
+    state.notes.splice(saved, 1);
+    save();
+    toast('Đã bỏ khỏi sổ từ');
+  } else {
+    state.notes.unshift({id: 'N' + Date.now().toString(36), kind: 'word', wordId, lessonId: owner.id, ko: w.ko, vi: w.vi, text: '', at: Date.now()});
+    save();
+    toast('Đã lưu vào sổ từ');
+  }
+  render();
 }
 
 /* ============ LUYỆN VIẾT ============ */
@@ -1889,6 +1903,7 @@ function act(name, d){
   switch(name){
     case 'clearSlot': setSlotFile(d.v, null); break;
     case 'upload': $('#fileInput').click(); break;
+    case 'dlFile': { const l = findLesson(d.id); if(l) downloadFile(l, d.v); break; }
     case 'calNav': { const now = new Date(); const cm = ui.cal || {y: now.getFullYear(), m: now.getMonth()}; const t = new Date(cm.y, cm.m + Number(d.v), 1); ui.cal = {y: t.getFullYear(), m: t.getMonth()}; renderSide(route()); break; }
     case 'gRefresh': refreshGrammar().then(() => { toast('Đã cập nhật ngữ pháp'); render(); }).catch(e => toast('Không đọc được sheet (' + e.message + '). Hãy bật "Bất kỳ ai có đường liên kết đều xem được" trong sheet.')); break;
     case 'folderToggle': { const set = ui.openFolders; if(set.has(d.v)) set.delete(d.v); else set.add(d.v); renderSide(route()); break; }
@@ -1961,6 +1976,24 @@ document.addEventListener('click', e => {
   if(el) act(el.dataset.act, el.dataset);
 });
 
+// Xem trước file gốc ngay trong trang: PDF, Word, Excel/CSV và văn bản thường
+async function previewHTML(blob, name){
+  const ext = (name || '').split('.').pop().toLowerCase();
+  if(blob.type === 'application/pdf' || ext === 'pdf') return {html: `<iframe class="pdf" src="${ui.fileUrl}" title="Xem trước"></iframe>`};
+  if(ext === 'docx'){
+    need(window.mammoth, 'Word');
+    const {value} = await mammoth.convertToHtml({arrayBuffer: await blob.arrayBuffer()});
+    return {html: `<div class="docprev">${value}</div>`};
+  }
+  if(['xlsx', 'xls', 'xlsm', 'ods', 'csv'].includes(ext)){
+    need(window.XLSX, 'Excel');
+    const wb = XLSX.read(await blob.arrayBuffer(), {type: 'array'});
+    const tables = wb.SheetNames.map(n => `<h3 class="step">${esc(n)}</h3><div class="xlprev">${XLSX.utils.sheet_to_html(wb.Sheets[n])}</div>`).join('');
+    return {html: tables};
+  }
+  if(['txt', 'md', 'tsv'].includes(ext)) return {html: `<pre class="txtprev">${esc(new TextDecoder('utf-8').decode(await blob.arrayBuffer()))}</pre>`};
+  return {html: '<p class="empty">File này chưa xem trước được. Bấm tên file ở trên để tải về.</p>'};
+}
 async function renderSourceWith(l, slot){
   const body = $('#srcBody');
   if(!body) return;
@@ -1970,11 +2003,24 @@ async function renderSourceWith(l, slot){
   const tabs = slots.map(s => `<a class="chip ${s === slot ? 'on' : ''}" href="#/lesson/${l.id}/source" data-slotpick="${s}">${SLOTS.find(x => x.key === s).title}</a>`).join('');
   if(!blob){ body.innerHTML = '<p class="empty">Không mở được file đã lưu.</p>'; return; }
   ui.fileUrl = URL.createObjectURL(blob);
-  const isPdf = blob.type === 'application/pdf' || /\.pdf$/i.test(l.files[slot] || '');
-  body.innerHTML = `<div class="chips" style="margin-bottom:12px">${tabs}</div>` + (isPdf
-    ? `<iframe class="pdf" src="${ui.fileUrl}" title="Tài liệu gốc"></iframe>`
-    : `<p class="empty">File này không xem trực tiếp được trong trang.</p>
-       <div class="row" style="justify-content:center"><a class="btn ghost" href="${ui.fileUrl}" download="${esc(l.files[slot])}">Tải file gốc</a></div>`);
+  try{
+    const {html} = await previewHTML(blob, l.files[slot]);
+    body.innerHTML = `<div class="chips" style="margin-bottom:12px">${tabs}</div>${html}`;
+  }catch(err){
+    body.innerHTML = `<div class="chips" style="margin-bottom:12px">${tabs}</div><p class="empty">Không xem trước được file này (${esc(err.message)}).</p>`;
+  }
+}
+async function downloadFile(l, slot){
+  const blob = await lessonFile(l, slot);
+  if(!blob){ toast('Không tìm thấy file đã lưu'); return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = l.files[slot] || 'tai-lieu';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 document.addEventListener('change', e => {
