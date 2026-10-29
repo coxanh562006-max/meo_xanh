@@ -918,7 +918,7 @@ function renderLesson(main, r){
         <button class="ghost" data-act="delLesson" data-id="${l.id}">Xóa bài</button>`;
   const known = l.words.filter(w => lvl(w.id) === 2).length;
   const primary = m.flash ? 'flash' : m.write ? 'write' : m.quiz ? 'quiz' : 'overview';
-  const fileNames = Object.entries(l.files || {}).map(([k, v]) => `<button class="file filelink" data-act="dlFile" data-id="${l.id}" data-v="${k}" title="Tải về">${esc(v)} ⬇</button>`).join('');
+  const fileNames = Object.entries(l.files || {}).map(([k, v]) => `<a class="file filelink" data-slot="${k}" download="${esc(v)}" href="#" title="Tải về">${esc(v)} ⬇</a>`).join('');
   let body = '';
   if(r.tab === 'overview') body = overviewView(l);
   else if(r.tab === 'flash') body = flashBody(l.words.map(w => ({w, l})), l.name);
@@ -945,6 +945,7 @@ function renderLesson(main, r){
     <div id="lessonBody">${body}</div>
     <p class="hint" style="margin-top:10px">${known}/${l.words.length} từ đã nhớ</p>`;
   if(r.tab === 'source') renderSourceWith(l, Object.keys(l.files || {})[0]);
+  bindFileLinks(l);
   if(r.tab === 'overview') bindOverview(l);
   if(r.tab === 'match') matchTimer();
   bindWriteUI();
@@ -2008,6 +2009,16 @@ async function renderSourceWith(l, slot){
     body.innerHTML = `<div class="chips" style="margin-bottom:12px">${tabs}</div>${html}`;
   }catch(err){
     body.innerHTML = `<div class="chips" style="margin-bottom:12px">${tabs}</div><p class="empty">Không xem trước được file này (${esc(err.message)}).</p>`;
+  }
+}
+// Gắn sẵn liên kết tải cho tên file ở đầu trang: bấm là trình duyệt tải ngay, không qua bước trung gian
+async function bindFileLinks(l){
+  for(const a of document.querySelectorAll('.filelink')){
+    const blob = await lessonFile(l, a.dataset.slot);
+    if(!blob) continue;
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.addEventListener('click', e => { if(!a.href.startsWith('blob:')) e.preventDefault(); });
   }
 }
 async function downloadFile(l, slot){
