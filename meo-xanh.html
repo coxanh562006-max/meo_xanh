@@ -232,6 +232,18 @@
   .rnew{border:2px dashed #c9d2dd;border-radius:18px;display:grid;place-items:center;color:#0f5e4a;min-height:120px;background:none;cursor:pointer;font-weight:600;font-size:16px}
   @media (max-width:1000px){ .mcards{grid-template-columns:repeat(3,1fr)} }
   @media (max-width:640px){ .mcards{grid-template-columns:1fr 1fr} .rgrid{grid-template-columns:1fr} .dtitle{font-size:18px} }
+  .streak{margin:14px 12px 4px;font-size:14px;color:var(--ink)}
+  .streak b{color:var(--warn);font-size:16px}
+  .cal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;margin:8px 0 6px;font-size:12px}
+  .calhead{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:6px}
+  .calhead strong{font-size:13px}
+  .calhead button{min-height:28px;min-width:28px;padding:0;font-size:18px;line-height:1;background:transparent;color:var(--muted)}
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+  .calgrid span{height:26px;line-height:26px;border-radius:50%;font-size:12px}
+  .calweek span{color:var(--muted);font-weight:600}
+  .calgrid .sun{color:#d9534f}
+  .calgrid .studied{background:var(--soft);color:var(--primary);font-weight:700}
+  .calgrid .today{background:#222;color:#fff;font-weight:700}
   .kindrow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}
   .kindrow:last-of-type{border-bottom:0}
   .kindrow input{width:18px;height:18px;min-height:0;accent-color:var(--primary)}
@@ -247,7 +259,7 @@
     .brand{padding:0 8px 0 0;flex:none}
     .newbtn{width:auto;margin:0 6px 0 0;flex:none;padding:8px 14px;min-height:38px}
     .navlink{flex:none;padding:8px 10px;white-space:nowrap}
-    .sec,.lessonlist,.folderlabel{display:none}
+    .sec,.lessonlist,.folderlabel,.cal,.streak{display:none}
     main{padding:18px 16px 60px}
     h1{font-size:22px}
   }
@@ -324,6 +336,7 @@ function load(){
       const progress = s.progress || {};
       Object.values(progress).forEach(p => { if(p.level === undefined) p.level = p.known ? 2 : 0; });
       return {
+        days: s.days || {},
         lessons: s.lessons.map(l => ({
           modes: {...DEFAULT_MODES}, quizCount: 20, createdAt: 0,
           files: l.hasFile ? {vocab: l.fileName} : {},  // bài tạo từ phiên bản cũ
@@ -333,7 +346,7 @@ function load(){
       };
     }
   }catch(e){}
-  return {lessons: [], progress: {}, notes: []};
+  return {lessons: [], progress: {}, notes: [], days: {}};
 }
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(state)); }
@@ -359,7 +372,45 @@ const lev = (a, b) => {
 const findLesson = id => (id && String(id).startsWith('G_')) ? grammarLesson(String(id).slice(2)) : state.lessons.find(l => l.id === id);
 const prog = id => state.progress[id] || {level: 0};
 const lvl = id => prog(id).level || 0;
-function setProg(id, patch){ state.progress[id] = {...prog(id), ...patch}; save(); }
+function markStudied(){
+  state.days = state.days || {};
+  state.days[dayKey(new Date())] = true;
+}
+function setProg(id, patch){ state.progress[id] = {...prog(id), ...patch}; markStudied(); save(); }
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+// Số ngày học liên tiếp tính đến hôm nay (hoặc hôm qua nếu hôm nay chưa học)
+function streakCount(){
+  const d = new Date();
+  if(!state.days[dayKey(d)]) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while(state.days[dayKey(d)]){ n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+// Lịch tháng: tuần bắt đầu từ thứ 2, ngày học có nền xanh, hôm nay tô đen
+function calendarHTML(){
+  const now = new Date();
+  const cm = ui.cal || {y: now.getFullYear(), m: now.getMonth()};
+  const offset = (new Date(cm.y, cm.m, 1).getDay() + 6) % 7;
+  const days = new Date(cm.y, cm.m + 1, 0).getDate();
+  const todayKey = dayKey(now);
+  let cells = '';
+  for(let i = 0; i < offset; i++) cells += '<span></span>';
+  for(let d = 1; d <= days; d++){
+    const dt = new Date(cm.y, cm.m, d);
+    const k = dayKey(dt);
+    const cls = [k === todayKey ? 'today' : '', state.days[k] ? 'studied' : '', dt.getDay() === 0 ? 'sun' : ''].join(' ');
+    cells += `<span class="${cls.trim()}">${d}</span>`;
+  }
+  return `<div class="cal">
+    <div class="calhead">
+      <button class="icon" data-act="calNav" data-v="-1" aria-label="Tháng trước">‹</button>
+      <strong>Tháng ${cm.m + 1}, ${cm.y}</strong>
+      <button class="icon" data-act="calNav" data-v="1" aria-label="Tháng sau">›</button>
+    </div>
+    <div class="calgrid calweek"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
+    <div class="calgrid">${cells}</div>
+  </div>`;
+}
 function setLevel(id, level){ setProg(id, {level, known: level === 2}); }
 const lessonPct = l => l.words.length ? Math.round(100 * l.words.filter(w => lvl(w.id) === 2).length / l.words.length) : 0;
 const dueWords = () => state.lessons.flatMap(l => l.words).filter(w => lvl(w.id) < 2).length;
@@ -661,12 +712,12 @@ function renderSide(r){
       </button>` + (isOpen ? items.map(l =>
         `<a class="lessonlink ${r.id === l.id ? 'on' : ''}" href="#/lesson/${l.id}/overview" title="${esc(l.name)}">${esc(l.name)}</a>`).join('') : '');
   }).join('');
-  const due = dueWords();
   $('#side').innerHTML = `
     <a class="brand" href="#/home"><svg class="logo" viewBox="0 0 120 100" aria-hidden="true"><use href="#cat"/></svg>Mèo xanh</a>
     <button class="newbtn" data-act="upload">+ Tải bài mới</button>
     ${link('home', 'Trang chủ')}
-    ${link('review', 'Ôn tập hôm nay', due ? `<span class="count">${due}</span>` : '')}
+    <div class="streak">🔥 Chuỗi học: <b>${streakCount()}</b> ngày</div>
+    ${calendarHTML()}
     <a class="navlink ${r.id && String(r.id).startsWith('G_') ? 'on' : ''}" href="#/lesson/G_all/list">Ngữ pháp</a>
     ${r.id && String(r.id).startsWith('G_') ? weekNumbers().map(w => `<a class="lessonlink ${r.id === 'G_' + w ? 'on' : ''}" href="#/lesson/G_${w}/list">Tuần ${w}</a>`).join('') : ''}
     ${link('notes', 'Sổ từ của tôi')}
@@ -1261,6 +1312,8 @@ function sessRecord(id, ok){
   if(!s) return;
   clearTimeout(ui.wTimer);
   s.hist.push({id, ok});
+  markStudied();
+  save();
   s.cur = null;
   ui.reveal = false;
   resetInk();
@@ -1836,6 +1889,7 @@ function act(name, d){
   switch(name){
     case 'clearSlot': setSlotFile(d.v, null); break;
     case 'upload': $('#fileInput').click(); break;
+    case 'calNav': { const now = new Date(); const cm = ui.cal || {y: now.getFullYear(), m: now.getMonth()}; const t = new Date(cm.y, cm.m + Number(d.v), 1); ui.cal = {y: t.getFullYear(), m: t.getMonth()}; renderSide(route()); break; }
     case 'gRefresh': refreshGrammar().then(() => { toast('Đã cập nhật ngữ pháp'); render(); }).catch(e => toast('Không đọc được sheet (' + e.message + '). Hãy bật "Bất kỳ ai có đường liên kết đều xem được" trong sheet.')); break;
     case 'folderToggle': { const set = ui.openFolders; if(set.has(d.v)) set.delete(d.v); else set.add(d.v); renderSide(route()); break; }
     case 'preview': openPreview(); break;
