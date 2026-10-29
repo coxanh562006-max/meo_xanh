@@ -1414,7 +1414,7 @@ function writeWord(l, pool){
       <button class="ghost" data-act="wNext">Từ khác →</button>
       ${ui.wRes ? '' : '<button data-act="wSubmit">Nộp</button>'}
     </div>
-    ${ui.wRes ? '' : '<p class="hint" style="text-align:right">Gõ xong bấm Nộp hoặc nhấn Enter</p>'}
+    ${ui.wRes ? '<p class="hint" style="text-align:right">Nhấn Enter hoặc phím → để sang từ tiếp theo</p>' : '<p class="hint" style="text-align:right">Gõ xong bấm Nộp hoặc nhấn Enter</p>'}
   </div>`;
 }
 function writeSent(l){
@@ -2292,7 +2292,8 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Enter' && e.target.id === 'wIn') ui.wRes ? nextInk() : wordSubmit();
     return;
   }
-  if(ui.wRes && e.key === 'Enter' && route().tab === 'write'){ nextInk(); return; }
+  const writingDone = route().tab === 'write' && (ui.wRes || (ui.ink && ui.reveal));
+  if(writingDone && (e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'ArrowDown')){ e.preventDefault(); nextInk(); return; }
   if(e.target.closest('button') && (e.key === 'Enter' || e.key === ' ')) return;
   const r = route();
   if(r.name === 'lesson' && r.tab === 'flash' || r.name === 'review'){
