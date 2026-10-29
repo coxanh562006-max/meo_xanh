@@ -1328,6 +1328,7 @@ function writeView(l, sub){
 function pickId(pool, key){
   if(!pool.some(w => w.id === ui[key])){
     ui[key] = shuffle(pool)[0].id;
+    if(key === 'wId') ui.wRes = null;
     resetInk();
     ui.reveal = false;
   }
@@ -1365,23 +1366,18 @@ function feedbackHTML(r, w, dir){
   if(r.verdict === 'near') return `<div class="fb near"><b>Gần đúng</b>${dir === 'vi-ko' && r.dist ? ` — sai ${r.dist} chữ` : ''}. Đáp án: <b>${answer}</b></div>`;
   return `<div class="fb bad"><b>Chưa đúng.</b> Đáp án: <b>${answer}</b></div>`;
 }
-// Tự kiểm tra khi người học gõ xong (dừng gõ khoảng 0,7 giây)
-function wordAutoCheck(){
+// Chấm khi người học bấm Nộp (hoặc Enter)
+function wordSubmit(){
   const l = findLesson(route().id);
   const w = l && l.words.find(x => x.id === ui.wId);
   const box = $('#wIn');
   if(!w || !box) return;
-  clearTimeout(ui.wTimer);
   const v = box.value.trim();
-  if(!v){ $('#wFb').innerHTML = ''; return; }
-  ui.wTimer = setTimeout(() => {
-    const r = judgeWord(w, v, ui.wDir);
-    $('#wFb').innerHTML = feedbackHTML(r, w, ui.wDir);
-    if(r.verdict === 'ok'){
-      setProg(w.id, {wOk: true});
-      ui.wTimer = setTimeout(nextInk, 1200);
-    }
-  }, 700);
+  if(!v){ toast('Gõ đáp án trước khi nộp'); return; }
+  const r = judgeWord(w, v, ui.wDir);
+  ui.wRes = {...r, v};
+  if(r.verdict === 'ok') setProg(w.id, {wOk: true});
+  render();
 }
 function writeWord(l, pool){
   if(!pool.length) return '<div class="card empty">Các từ trong bài chưa có nghĩa tiếng Việt.</div>';
@@ -1395,12 +1391,12 @@ function writeWord(l, pool){
   const promptHTML = `<div class="prompt ${toKo ? '' : 'ko'}">${esc(prompt)}</div>`;
   if(ui.ink){
     const actions = ui.reveal
-      ? `<div class="fb" style="margin-top:12px">Đáp án: <b class="ko">${esc(toKo ? w.ko : w.vi)}</b></div>
+      ? `<div class="fb" style="margin-top:12px">Đáp án: <b class="ko">${esc(toKo ? w.ko : w.vi)}</b><div class="hint" style="margin-top:4px">Đối chiếu nét bút của bạn rồi chọn bên dưới.</div></div>
          <div class="row" style="justify-content:space-between;margin-top:14px">
            <button class="ghost" data-act="inkNext">Chưa đúng</button>
            <button data-act="inkOk">Tôi viết đúng ✓</button>
          </div>`
-      : `<div class="row" style="justify-content:flex-end;margin-top:14px"><button data-act="inkReveal">Xem đáp án</button></div>`;
+      : `<div class="row" style="justify-content:flex-end;margin-top:14px"><button data-act="inkReveal">Nộp</button></div>`;
     return `<div class="wcard card">
       <div class="qhead"><span class="eyebrow">1 · Viết từ</span>${counter}</div>
       <div class="meta" style="text-align:center">${ask} bằng bút.</div>
@@ -1412,12 +1408,13 @@ function writeWord(l, pool){
     <div class="qhead"><span class="eyebrow">1 · Viết từ</span>${counter}</div>
     <div class="meta" style="text-align:center">${ask}.</div>
     ${promptHTML}${hint}
-    <label class="f">Câu trả lời<input id="wIn" autocomplete="off" placeholder="${toKo ? 'Gõ từ tiếng Hàn…' : 'Gõ nghĩa tiếng Việt…'}"></label>
-    <div id="wFb"></div>
+    <label class="f">Câu trả lời<input id="wIn" autocomplete="off" ${ui.wRes ? 'disabled' : ''} value="${ui.wRes ? esc(ui.wRes.v) : ''}" placeholder="${toKo ? 'Gõ từ tiếng Hàn…' : 'Gõ nghĩa tiếng Việt…'}"></label>
+    ${ui.wRes ? feedbackHTML(ui.wRes, w, ui.wDir) : ''}
     <div class="row between" style="margin-top:12px">
       <button class="ghost" data-act="wNext">Từ khác →</button>
-      <span class="hint">Tự kiểm tra khi bạn gõ xong</span>
+      ${ui.wRes ? '' : '<button data-act="wSubmit">Nộp</button>'}
     </div>
+    ${ui.wRes ? '' : '<p class="hint" style="text-align:right">Gõ xong bấm Nộp hoặc nhấn Enter</p>'}
   </div>`;
 }
 function writeSent(l){
@@ -1620,8 +1617,6 @@ function writeExt(l, pool){
 // Khung viết tay: bút, tẩy theo từng nét, quay lại / quay lên
 function bindWriteUI(){
   bindInk();
-  const wi = $('#wIn');
-  if(wi) wi.oninput = wordAutoCheck;
   const si = $('#sIn');
   if(si) si.oninput = sentAutoCheck;
 }
@@ -2158,6 +2153,7 @@ function act(name, d){
     case 'wFilter': ui.wFilter = d.v; ui.wId = null; ui.sId = null; ui.eId = null; render(); break;
     case 'wDir': ui.wDir = d.v; ui.wId = null; resetInk(); render(); break;
     case 'wNext': nextInk(); break;
+    case 'wSubmit': wordSubmit(); break;
     case 'inkReveal': ui.reveal = true; render(); break;
     case 'inkOk': { const l = findLesson(route().id); const w = l && l.words.find(x => x.id === ui.wId); if(w) setProg(w.id, {wOk: true}); nextInk(); break; }
     case 'inkNext': nextInk(); break;
@@ -2293,9 +2289,10 @@ document.addEventListener('change', e => {
 document.addEventListener('keydown', e => {
   const field = e.target.closest('input, textarea, select');
   if(field){
-    if(e.key === 'Enter' && e.target.id === 'wIn') wordAutoCheck();
+    if(e.key === 'Enter' && e.target.id === 'wIn') ui.wRes ? nextInk() : wordSubmit();
     return;
   }
+  if(ui.wRes && e.key === 'Enter' && route().tab === 'write'){ nextInk(); return; }
   if(e.target.closest('button') && (e.key === 'Enter' || e.key === ' ')) return;
   const r = route();
   if(r.name === 'lesson' && r.tab === 'flash' || r.name === 'review'){
