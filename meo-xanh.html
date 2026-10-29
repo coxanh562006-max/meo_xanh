@@ -266,7 +266,7 @@
     .brand{padding:0 8px 0 0;flex:none}
     .newbtn{width:auto;margin:0 6px 0 0;flex:none;padding:8px 14px;min-height:38px}
     .navlink{flex:none;padding:8px 10px;white-space:nowrap}
-    .sec,.lessonlist,.folderlabel,.cal,.streak{display:none}
+    .sec,.lessonlist,.folderlabel,.cal,.streak,.sidetog{display:none}
     main{padding:18px 16px 60px}
     h1{font-size:22px}
   }
@@ -293,6 +293,20 @@
   .navlink:hover{background:#f4f8f7}
   .navlink.on{background:transparent;color:var(--ink);font-weight:600}
   .ni{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none}
+  .sidehead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:0}
+  .sidehead .brand{padding-bottom:18px}
+  .sidetog{background:#fff;color:var(--muted);border:1px solid var(--line);min-height:32px;width:32px;padding:0;border-radius:10px;font-size:20px;line-height:1;flex:none}
+  .plus{display:none}
+  .app.collapsed{grid-template-columns:86px minmax(0,1fr)}
+  .app.collapsed aside.side{padding:18px 10px;overflow:hidden}
+  .app.collapsed .sidehead{flex-direction:column;gap:6px}
+  .app.collapsed .sidehead .brand{padding:0 0 6px;justify-content:center}
+  .app.collapsed .sidetog{transform:rotate(180deg)}
+  .app.collapsed .lbl,.app.collapsed .sec,.app.collapsed .lessonlist,.app.collapsed .streakcard{display:none}
+  .app.collapsed .navlink{justify-content:center;padding:9px 0}
+  .app.collapsed .newbtn{padding:0;font-size:0;min-height:44px}
+  .app.collapsed .newbtn .plus{display:inline;font-size:24px;color:#fff}
+  .app.collapsed .navlink .ni{margin:0}
   .streakcard{background:#fff7ec;border-radius:20px;padding:14px;margin:14px 0 14px;border:1px solid #fbe5c7}
   .sct{display:flex;align-items:center;gap:8px;color:#b5520d;font-size:15px}
   .scm{font-size:12px;color:#8a6b4f;margin:2px 0 10px}
@@ -973,9 +987,13 @@ function render(){
   if(r.name === 'stats') return renderStats(main);
 }
 
+function isSideCollapsed(){
+  try{ return localStorage.getItem('meo-xanh-side') === '1'; } catch(e){ return false; }
+}
 function renderSide(r){
+  document.querySelector('.app').classList.toggle('collapsed', isSideCollapsed());
   const link = (name, label, badge = '') =>
-    `<a class="navlink ${r.name === name ? 'on' : ''}" href="#/${name}">${navIcon(name)}${label}${badge}</a>`;
+    `<a class="navlink ${r.name === name ? 'on' : ''}" href="#/${name}" title="${label}">${navIcon(name)}<span class="lbl">${label}</span>${badge}</a>`;
   const folders = [...new Set(state.lessons.map(l => l.folder))].sort((a, b) => a.localeCompare(b, 'vi'));
   const openSet = ui.openFolders || (ui.openFolders = new Set());
   const cur = r.name === 'lesson' && findLesson(r.id);
@@ -989,11 +1007,14 @@ function renderSide(r){
         `<a class="lessonlink ${r.id === l.id ? 'on' : ''}" href="#/lesson/${l.id}/overview" title="${esc(l.name)}">${esc(l.name)}</a>`).join('') : '');
   }).join('');
   $('#side').innerHTML = `
-    <a class="brand" href="#/home"><svg class="logo" viewBox="0 0 120 100" aria-hidden="true"><use href="#cat"/></svg>Mèo xanh</a>
-    <button class="newbtn" data-act="upload">+ Tải bài mới</button>
+    <div class="sidehead">
+      <a class="brand" href="#/home"><svg class="logo" viewBox="0 0 120 100" aria-hidden="true"><use href="#cat"/></svg><span class="lbl">Mèo xanh</span></a>
+      <button class="sidetog" data-act="sideToggle" aria-label="Thu gọn thanh bên" title="Thu gọn / mở rộng">‹</button>
+    </div>
+    <button class="newbtn" data-act="upload" title="Tải bài mới"><span class="lbl">+ Tải bài mới</span><span class="plus">+</span></button>
     ${link('home', 'Trang chủ')}
     ${streakCardHTML()}
-    <a class="navlink ${r.id && String(r.id).startsWith('G_') ? 'on' : ''}" href="#/lesson/G_all/list">${navIcon('grammar')}Ngữ pháp</a>
+    <a class="navlink ${r.id && String(r.id).startsWith('G_') ? 'on' : ''}" href="#/lesson/G_all/list" title="Ngữ pháp">${navIcon('grammar')}<span class="lbl">Ngữ pháp</span></a>
     ${r.id && String(r.id).startsWith('G_') ? weekNumbers().map(w => `<a class="lessonlink ${r.id === 'G_' + w ? 'on' : ''}" href="#/lesson/G_${w}/list">Tuần ${w}</a>`).join('') : ''}
     ${link('notes', 'Sổ từ của tôi')}
     ${link('stats', 'Thống kê')}
@@ -2344,6 +2365,7 @@ function act(name, d){
   switch(name){
     case 'clearSlot': setSlotFile(d.v, null); break;
     case 'upload': $('#fileInput').click(); break;
+    case 'sideToggle': { const c = !isSideCollapsed(); try{ localStorage.setItem('meo-xanh-side', c ? '1' : '0'); } catch(e){} renderSide(route()); break; }
     case 'calToggle': ui.calFull = !ui.calFull; renderSide(route()); break;
     case 'quizCount': { const l = findLesson(route().id); if(l){ l.quizCount = +d.v; } ui.quiz = null; save(); render(); break; }
     case 'quizSkip': { const q = ui.quiz; if(q && q.answered === null){ q.answered = 'skip'; recordAnswer(false); render(); } break; }
