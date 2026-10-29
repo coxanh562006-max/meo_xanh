@@ -427,6 +427,109 @@
     .mgrid{grid-template-columns:repeat(3,1fr)}
     .lmain h1{font-size:24px}
   }
+
+  /* Thống kê & Sổ từ */
+  .sbanner{position:relative;overflow:hidden;display:flex;gap:22px;align-items:center;flex-wrap:wrap;border-radius:28px;padding:24px 28px;margin-bottom:18px}
+  .sbanner.blue{background:#e4edfc}
+  .sbanner.pink{background:#fde8f1}
+  .sbody{flex:1;min-width:220px;position:relative}
+  .sbody h1{font-size:30px;margin:4px 0 8px}
+  .sbody p{margin:0;color:#2f4f7a;font-size:16px;line-height:1.5}
+  .sbanner.pink .sbody p{color:#a02f5c}
+  .sdon{position:relative;width:150px;height:150px;flex:none}
+  .sdc{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+  .sdc b{font-size:34px;color:#153f8a}
+  .sdc span{color:#2f6fd0;font-weight:600}
+  .sbtn{background:#3b82f6;box-shadow:0 4px 0 #2e6cd3;border-radius:16px;min-height:50px;padding:12px 22px;position:relative}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--muted);align-items:center}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .legend.big{margin-top:12px;font-size:15px;color:#153f8a}
+  .sgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .sstat{border-radius:22px;padding:18px;display:flex;gap:14px;align-items:center}
+  .sstat b{font-size:26px;display:block;line-height:1.1}
+  .sstat b small{font-size:15px;font-weight:600}
+  .sstat span{font-size:14px;font-weight:600}
+  .sstat .sico{width:46px;height:46px;border-radius:16px;background:#fff;display:grid;place-items:center;flex:none}
+  .s-green{background:#dff3ec;color:#0e7c66}
+  .s-purple{background:#ece7fd;color:#6a4fc8}
+  .s-mint{background:#dff4e7;color:#2f9e5b}
+  .s-orange{background:#fdeedd;color:#c46a1a}
+  .sgrid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-bottom:18px}
+  .sc-head,.sc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+  .sc-head span{font-size:12px;color:var(--muted);font-weight:600;padding:4px 0}
+  .sc-head .sun{color:#d9534f}
+  .sc-day{height:42px;border-radius:12px;background:#f3f6f5;color:#8a9a95;display:grid;place-items:center;font-size:14px;font-weight:600}
+  .sc-day.blank{background:transparent}
+  .sc-day.studied{background:#fbd3ad;color:#7a3d0a}
+  .sc-day.today{background:#f08a2b;color:#fff;box-shadow:0 3px 0 #c96a1c}
+  .sc-day.future{background:transparent;border:1.5px dashed #d8e2de;color:#b8c5c0}
+  .sbadges{display:grid;align-content:start;gap:10px}
+  .badgecard{display:flex;gap:12px;align-items:center;background:#f3f8f6;border-radius:18px;padding:14px}
+  .badgecard.done{background:#fff7d8}
+  .bico{width:46px;height:46px;border-radius:50%;border:2px dashed;display:grid;place-items:center;flex:none;background:#fff}
+  .badgecard.done .bico{border-style:solid;background:#e8b93a;color:#fff !important;border-color:#e8b93a}
+  .bt{flex:1;display:grid;gap:2px}
+  .bt b{font-size:15px}
+  .bt span{font-size:13px;color:var(--muted)}
+  .bnum{font-weight:700;color:var(--muted);font-size:14px}
+  .lrow{display:grid;grid-template-columns:70px 1.1fr 1.6fr 80px auto;gap:14px;align-items:center;background:#f3f8f6;border-radius:20px;padding:14px 16px;margin-top:10px}
+  .ldon{position:relative;width:52px;height:52px}
+  .ldon b{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:#0e7c66}
+  .linfo{display:grid;gap:6px;justify-items:start}
+  .stack{display:flex;height:12px;border-radius:999px;overflow:hidden;background:#e4ebe8;margin-bottom:8px}
+  .stack i{display:block;height:100%}
+  .lacc{text-align:right;display:grid}
+  .lacc b{color:#c46a1a;font-size:20px}
+  .lacc span{font-size:12px;color:var(--muted)}
+  .stack + .legend{font-size:13px}
+  .ntabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .ntab{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-height:0;display:inline-flex;gap:6px;align-items:center;font-size:14px}
+  .ntab.on{background:#e8478a;color:#fff;border-color:transparent;box-shadow:0 3px 0 #b9336c}
+  .composer{background:#fffbe9;border-color:#f6ebbd;padding:20px}
+  .nfields{gap:10px;margin-bottom:10px}
+  .composer input,.composer textarea{background:#fff;border-color:#f0e4b5;border-radius:16px}
+  .addbtn{background:#e8478a;box-shadow:0 4px 0 #b9336c;border-radius:16px;min-height:46px;padding:10px 20px}
+  .nfilter{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin:18px 0 14px}
+  .nchip{border-radius:999px;padding:8px 14px;min-height:0;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .nchip.chip-teal.on{background:#16a085;color:#fff;border-color:transparent}
+  .nchip.chip-pink.on{background:#fde8f1;color:#c2396a;border-color:#f6c6da}
+  .nchip.chip-yellow.on{background:#fff4c7;color:#a8701a;border-color:#f3dd8c}
+  .nsearch{max-width:300px;border-radius:999px}
+  .note-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:10px}
+  .note-item.is-word{border-left:4px solid #e8478a}
+  .note-item.is-note{border-left:4px solid #e8b93a}
+  .nko{font-weight:800;font-size:22px}
+  .nvi{color:var(--muted);font-size:15px;margin-top:2px}
+  .ntext{font-size:15px;margin-top:6px;white-space:pre-wrap}
+  .ntext.big{font-size:16px;margin-top:0}
+  .nbody{display:grid;gap:6px;justify-items:start;flex:1}
+  .empty-notes{background:#fff;border:2px dashed #f2c9da;border-radius:28px;padding:28px;text-align:center}
+  .empty-notes h2{font-size:24px;margin-bottom:4px}
+  .sugg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+  .sg{border-radius:22px;padding:18px;text-align:left;display:grid;gap:6px;position:relative}
+  .sg.purple{background:#ece7fd;color:#4b3fa3}
+  .sg.green{background:#dff4e7;color:#1f7a45}
+  .sg.yellow{background:#fff4c7;color:#8a5a00}
+  .sgn{position:absolute;right:16px;top:8px;font-size:34px;font-weight:800;opacity:.25}
+  .sgi{width:40px;height:40px;border-radius:14px;background:#fff;display:grid;place-items:center}
+  .sg b{font-size:16px}
+  .sg span{font-size:14px;opacity:.85}
+  .cta{background:#7c5cd6;box-shadow:0 4px 0 #5f43b5;border-radius:16px;min-height:48px;padding:12px 22px}
+  .star-pill{display:inline-block;background:#fff;color:#c2396a;border-radius:999px;padding:2px 10px;font-weight:600;font-size:14px}
+  .stats-pills{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .sp{background:#fff;border-radius:16px;padding:10px 16px;font-size:15px}
+  .sp b{font-size:22px;margin-right:6px}
+  .sp.pink b{color:#c2396a}
+  .sp.yellow b{color:#a8701a}
+  .sart{position:relative;width:200px;height:140px;flex:none}
+  .card-back{position:absolute;left:0;top:26px;width:150px;height:90px;border-radius:16px;background:#fbe9a6;transform:rotate(-6deg)}
+  .card-front{position:absolute;right:10px;top:0;width:150px;height:100px;background:#fff;border-radius:16px;box-shadow:0 4px 0 #f6c6da;transform:rotate(4deg);padding:12px;display:grid;gap:2px}
+  .card-front b{color:#7a1a3d;font-size:18px}
+  .card-front small{color:var(--muted)}
+  .card-front i{color:#e8478a;font-style:normal}
+  .cat-mini{position:absolute;right:-6px;bottom:-6px;width:56px;height:52px;border-radius:18px;background:#fff;display:grid;place-items:center;box-shadow:0 3px 0 #f6c6da}
+  @media (max-width:1000px){ .sgrid4{grid-template-columns:1fr 1fr} .sgrid2{grid-template-columns:1fr} .lrow{grid-template-columns:60px 1fr 1fr} .sugg{grid-template-columns:1fr} }
+  @media (max-width:640px){ .sgrid4{grid-template-columns:1fr 1fr} .sdon{width:120px;height:120px} .sart{display:none} .lrow{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -479,7 +582,7 @@ const ui = {
   ink: false, strokes: [], past: [], future: [], tool: 'pen', reveal: false,
   wFilter: 'all', wDir: 'vi-ko', wTimer: null, sess: null,
   fl: null, wId: null, wRes: null, sId: null, sRes: null, eId: null, eRes: null,
-  quiz: null, ovPage: 1, ovQuery: '', listPage: 1, notesFilter: 'all',
+  quiz: null, ovPage: 1, ovQuery: '', listPage: 1, notesFilter: 'all', noteQuery: '', noteTab: 'word',
   draft: null, fileUrl: null, attachId: null
 };
 
@@ -955,7 +1058,11 @@ const ICON = {
   home: '<path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/>',
   notes: '<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 8h6M9 12h6"/>',
   stats: '<path d="M6 20V11M12 20V6M18 20v-8"/>',
-  grammar: '<path d="M4 6h10M9 6v12M14 12h6M17 9v6"/>'
+  grammar: '<path d="M4 6h10M9 6v12M14 12h6M17 9v6"/>',
+  book: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h11"/>',
+  smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/>',
+  star: '<path d="M12 4l2.4 5 5.4.7-4 3.7 1 5.4L12 16.3 7.2 18.8l1-5.4-4-3.7 5.4-.7z"/>',
+  note: '<path d="M5 5h14v10l-4 4H5z"/><path d="M15 19v-4h4"/>'
 };
 const TAB_STYLE = {overview: ['#dff3ec', '#0e7c66', 'grid'], flash: ['#ece7fd', '#6a4fc8', 'card'], match: ['#fde4ef', '#c2396a', 'grid'],
   write: ['#dff4e7', '#2f9e5b', 'pen'], quiz: ['#dfeafc', '#2f6fd0', 'check'], source: ['#fdeedd', '#c46a1a', 'doc'], list: ['#ece7fd', '#6a4fc8', 'doc']};
@@ -1967,80 +2074,202 @@ function matchPick(u){
 
 /* ============ TÀI LIỆU GỐC ============ */
 /* ============ SỔ TỪ CỦA TÔI ============ */
-function renderNotes(main){
-  const list = state.notes.filter(n => ui.notesFilter === 'all' || (ui.notesFilter === 'word' ? n.kind === 'word' : n.kind === 'note'));
-  const lessonName = id => (findLesson(id) || {}).name || '';
+const donut = (pct, size, stroke, color, track = '#e6eeec') => {
+  const r = (size - stroke) / 2, c = 2 * Math.PI * r;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg);display:block" aria-hidden="true">
+    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${track}" stroke-width="${stroke}"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${(c * Math.min(pct, 100) / 100).toFixed(1)} ${c.toFixed(1)}"/>
+  </svg>`;
+};
+function renderStats(main){
+  const words = state.lessons.flatMap(l => l.words);
+  const total = words.length;
+  const known = words.filter(w => lvl(w.id) === 2).length;
+  const hard = words.filter(w => lvl(w.id) === 1).length;
+  const learnt = total - known - hard;
+  const pct = total ? Math.round(100 * known / total) : 0;
+  const qr = words.reduce((n, w) => n + (prog(w.id).qr || 0), 0);
+  const qw = words.reduce((n, w) => n + (prog(w.id).qw || 0), 0);
+  const accPct = qr + qw ? Math.round(100 * qr / (qr + qw)) : null;
+  const streak = streakCount();
+  const dayCount = Object.values(state.days).filter(Boolean).length;
+  const now = new Date();
+  const cm = ui.cal || {y: now.getFullYear(), m: now.getMonth()};
+  const offset = (new Date(cm.y, cm.m, 1).getDay() + 6) % 7;
+  const monthDays = new Date(cm.y, cm.m + 1, 0).getDate();
+  const todayKey = dayKey(now);
+  let cells = '';
+  for(let i = 0; i < offset; i++) cells += '<span class="sc-day blank"></span>';
+  for(let d = 1; d <= monthDays; d++){
+    const dt = new Date(cm.y, cm.m, d);
+    const k = dayKey(dt);
+    const cls = k === todayKey ? 'today' : state.days[k] ? 'studied' : (dt > now ? 'future' : '');
+    cells += `<span class="sc-day ${cls}">${d}</span>`;
+  }
+  const perLesson = state.lessons.map(l => {
+    const kn = l.words.filter(w => lvl(w.id) === 2).length;
+    const hd = l.words.filter(w => lvl(w.id) === 1).length;
+    const n = l.words.length || 1;
+    const lp = Math.round(100 * kn / n);
+    const lr = l.words.reduce((x, w) => x + (prog(w.id).qr || 0), 0);
+    const lw = l.words.reduce((x, w) => x + (prog(w.id).qw || 0), 0);
+    const la = lr + lw ? Math.round(100 * lr / (lr + lw)) + '%' : '—';
+    return `<div class="lrow">
+      <div class="ldon">${donut(lp, 52, 6, '#16a085')}<b>${lp}%</b></div>
+      <div class="linfo"><b>${esc(l.name)}</b><span class="badge b-gray">${esc(l.folder)}</span></div>
+      <div class="lbarw">
+        <div class="stack"><i style="width:${Math.round(100 * kn / n)}%;background:#2f9e5b"></i><i style="width:${Math.round(100 * hd / n)}%;background:#e8b93a"></i></div>
+        <div class="legend"><span><i style="background:#2f9e5b"></i>Đã nhớ ${kn}</span><span><i style="background:#e8b93a"></i>Hơi nhớ ${hd}</span><span><i style="background:#cfd8d5"></i>Chưa học ${n - kn - hd}</span></div>
+      </div>
+      <div class="lacc"><b>${la}</b><span>trắc nghiệm</span></div>
+      <a class="btn ghost" href="#/lesson/${l.id}/overview">Mở bài →</a>
+    </div>`;
+  }).join('');
+  const badge = (icon, title, sub, ratio, color) => `<div class="badgecard ${ratio >= 1 ? 'done' : ''}">
+      <div class="bico" style="border-color:${color};color:${color}">${icon}</div>
+      <div class="bt"><b>${title}</b><span>${sub}</span>
+        <div class="track" style="margin-top:8px"><div class="fill" style="width:${Math.min(100, Math.round(ratio * 100))}%;background:${color}"></div></div>
+      </div>
+      <span class="bnum">${ratio >= 1 ? '✓' : ''}</span>
+    </div>`;
+  const firstLesson = state.lessons[0];
   main.innerHTML = `
-    <div class="crumb">Sổ từ</div>
-    <h1>Sổ từ của tôi</h1>
-    <p class="sub">Những từ và câu bạn thấy hay hoặc cần chú ý. Trong Flashcard bấm "★ Lưu vào sổ từ" để thêm từ.</p>
-    <div class="card" style="margin-top:16px">
-      <textarea id="noteText" rows="2" placeholder="Viết câu hoặc ghi chú…"></textarea>
-      <div class="row between" style="margin-top:8px">
-        <select id="noteLesson" style="flex:1;min-width:200px;max-width:340px">
+    <div class="sbanner blue">
+      <div class="sdon">${donut(pct, 150, 14, '#2f6fd0', '#ffffff')}<div class="sdc"><b>${pct}%</b><span>đã nhớ</span></div></div>
+      <div class="sbody">
+        <div class="crumb" style="color:#2f6fd0">Thống kê</div>
+        <h1 style="color:#153f8a">Tiến độ của bạn</h1>
+        <p>Bạn đã nhớ <b>${known}/${total} từ</b> và đang giữ chuỗi <b>${streak} ngày</b>. Học thêm ngày mai để mở huy hiệu “Chuỗi 3 ngày”!</p>
+        <div class="legend big"><span><i style="background:#2f6fd0"></i>Đã nhớ ${known}</span><span><i style="background:#9bbcf0"></i>Hơi nhớ ${hard}</span><span><i style="background:#fff;border:1px solid #9bbcf0"></i>Chưa học ${learnt}</span></div>
+      </div>
+      ${firstLesson ? `<a class="btn sbtn" href="#/lesson/${firstLesson.id}/flash">▷ Học thẻ · ${total} từ</a>` : ''}
+    </div>
+
+    <div class="sgrid4">
+      <div class="sstat s-green"><div class="sico">${svgIcon('book', 22)}</div><div><b>${state.lessons.length}</b><span>Số bài</span></div></div>
+      <div class="sstat s-purple"><div class="sico">${svgIcon('card', 22)}</div><div><b>${total}</b><span>Tổng số từ</span></div></div>
+      <div class="sstat s-mint"><div class="sico">${svgIcon('smile', 22)}</div><div><b>${known} <small>từ</small></b><span>Đã nhớ · ${pct}%</span></div></div>
+      <div class="sstat s-orange"><div class="sico">${svgIcon('target', 22)}</div><div><b>${accPct === null ? 'Chưa làm' : accPct + '%'}</b><span>Trắc nghiệm đúng${qr + qw ? ` · ${qr}/${qr + qw}` : ''}</span></div></div>
+    </div>
+
+    <div class="sgrid2">
+      <div class="card scal">
+        <div class="row between" style="margin-bottom:10px">
+          <h2 style="margin:0;display:flex;align-items:center;gap:8px"><span style="color:#f08a2b">🔥</span>Lịch học tháng ${cm.m + 1}</h2>
+          <span class="badge b-warn">${streak} ngày liên tiếp</span>
+        </div>
+        <div class="sc-head">${['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((x, i) => `<span class="${i === 6 ? 'sun' : ''}">${x}</span>`).join('')}</div>
+        <div class="sc-grid">${cells}</div>
+        <div class="row between" style="margin-top:12px">
+          <div class="row" style="gap:6px"><button class="icon" data-act="calNav" data-v="-1" aria-label="Tháng trước">‹</button><button class="icon" data-act="calNav" data-v="1" aria-label="Tháng sau">›</button></div>
+          <span class="legend"><span><i style="background:#fbd3ad"></i>Đã học</span><span><i style="background:#f08a2b"></i>Hôm nay</span></span>
+        </div>
+      </div>
+      <div class="card sbadges">
+        <div class="row" style="gap:8px;margin-bottom:12px"><span style="color:#e8b93a">☆</span><h2 style="margin:0">Huy hiệu</h2></div>
+        ${badge(svgIcon('spark', 20), 'Bước chân đầu tiên', dayCount ? 'Đã mở khóa' : 'Học một lần để mở khóa', dayCount ? 1 : 0, '#e8b93a')}
+        ${badge(svgIcon('bulb', 20), 'Chuỗi 3 ngày', `${Math.min(streak, 3)}/3`, Math.min(streak, 3) / 3, '#f08a2b')}
+        ${badge(svgIcon('card', 20), 'Nhớ 100 từ', `${Math.min(known, 100)}/100`, Math.min(known, 100) / 100, '#7c5cd6')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:12px">
+        <h2 style="margin:0">Theo từng bài</h2>
+        <span class="meta">${state.lessons.length} bài · ${total} từ</span>
+      </div>
+      ${perLesson || '<p class="empty">Chưa có bài nào.</p>'}
+    </div>`;
+}
+const NOTE_TABS = [['word', 'Từ mới', 'star'], ['sentence', 'Câu hay', 'book'], ['note', 'Ghi chú', 'note']];
+function noteList(){
+  const q = ui.noteQuery.trim().toLowerCase();
+  return state.notes.filter(n => (ui.notesFilter === 'all' || (ui.notesFilter === 'word' ? n.kind === 'word' : n.kind === 'note'))
+    && (!q || (n.ko || '').toLowerCase().includes(q) || (n.vi || '').toLowerCase().includes(q) || (n.text || '').toLowerCase().includes(q)));
+}
+function noteListHTML(){
+  const list = noteList();
+  const lessonName = id => (findLesson(id) || {}).name || '';
+  if(!state.notes.length) return `<div class="empty-notes">
+      <h2>Sổ từ còn trống trơn</h2>
+      <p class="sub">Mèo xanh gợi ý 3 cách để bắt đầu:</p>
+      <div class="sugg">
+        <div class="sg purple"><span class="sgn">1</span><div class="sgi">${svgIcon('card', 20)}</div><b>Lưu từ khi học Flashcard</b><span>Gặp từ khó, bấm ★ trên thẻ</span></div>
+        <div class="sg green"><span class="sgn">2</span><div class="sgi">${svgIcon('doc', 20)}</div><b>Chép lại câu hay</b><span>Câu ví dụ bạn muốn nhớ lâu</span></div>
+        <div class="sg yellow"><span class="sgn">3</span><div class="sgi">${svgIcon('bulb', 20)}</div><b>Ghi mẹo nhớ</b><span>Gắn vào bài để ôn cùng lúc</span></div>
+      </div>
+      ${state.lessons.length ? `<a class="btn cta" href="#/lesson/${state.lessons[0].id}/flash">▷ Mở Flashcard ${esc(state.lessons[0].name)}</a>` : ''}
+    </div>`;
+  if(!list.length) return '<p class="empty">Không có mục nào khớp.</p>';
+  return list.map(n => `<div class="note-item ${n.kind === 'word' ? 'is-word' : 'is-note'}">
+      <div class="nbody">
+        ${n.kind === 'word'
+          ? `<div class="nko">${esc(n.ko)}</div><div class="nvi">${esc(n.vi)}</div>${n.text ? `<div class="ntext">${esc(n.text)}</div>` : ''}`
+          : `<div class="ntext big">${esc(n.text)}</div>`}
+        ${n.lessonId ? `<span class="badge b-gray">${esc(lessonName(n.lessonId))}</span>` : ''}
+      </div>
+      <button class="icon" data-act="delNote" data-id="${n.id}" aria-label="Xóa">🗑</button>
+    </div>`).join('');
+}
+function renderNotes(main){
+  const words = state.notes.filter(n => n.kind === 'word').length;
+  const notes = state.notes.length - words;
+  const tab = ui.noteTab || 'word';
+  const counts = {all: state.notes.length, word: words, note: notes};
+  main.innerHTML = `
+    <div class="sbanner pink">
+      <div class="sbody">
+        <div class="crumb" style="color:#c2396a">Sổ từ</div>
+        <h1 style="color:#7a1a3d">Sổ từ của tôi</h1>
+        <p>Nơi cất những từ và câu bạn thấy hay hoặc cần chú ý. Trong Flashcard, bấm <span class="star-pill">★ Lưu vào sổ từ</span> để thêm nhanh.</p>
+        <div class="stats-pills"><span class="sp pink"><b>${words}</b> từ đã lưu</span><span class="sp yellow"><b>${notes}</b> ghi chú</span></div>
+      </div>
+      <div class="sart" aria-hidden="true"><span class="card-back"></span><span class="card-front"><b>메모리</b><small>Bộ nhớ</small><i>☆</i></span><span class="cat-mini"><svg viewBox="0 0 120 100" width="40" height="34"><use href="#cat"/></svg></span></div>
+    </div>
+
+    <div class="card composer">
+      <div class="ntabs">${NOTE_TABS.map(([k, t, ic]) => `<button class="ntab ${tab === k ? 'on' : ''}" data-act="noteTab" data-v="${k}">${svgIcon(ic, 16)}${t}</button>`).join('')}</div>
+      ${tab === 'word' ? `<div class="grid2 nfields">
+          <input id="nKo" placeholder="Từ tiếng Hàn… (vd: 메모리)">
+          <input id="nVi" placeholder="Nghĩa tiếng Việt… (vd: Bộ nhớ)">
+        </div>` : ''}
+      <textarea id="nText" rows="${tab === 'word' ? 2 : 3}" placeholder="${tab === 'word' ? 'Ghi chú thêm: mẹo nhớ, câu ví dụ…' : tab === 'sentence' ? 'Chép câu hay bạn muốn nhớ lâu…' : 'Viết ghi chú…'}"></textarea>
+      <div class="row between" style="margin-top:10px">
+        <select id="nLesson" style="max-width:320px">
           <option value="">Không gắn với bài nào</option>
           ${state.lessons.map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join('')}
         </select>
-        <button data-act="addNote">Thêm vào sổ từ</button>
+        <button class="addbtn" data-act="addNote">+ Thêm vào sổ từ</button>
       </div>
     </div>
-    <div class="chips" style="margin:18px 0 10px">${[['all', 'Tất cả'], ['word', 'Từ đã lưu'], ['note', 'Ghi chú']]
-      .map(([k, t]) => `<button class="chip ${ui.notesFilter === k ? 'on' : ''}" data-act="notesFilter" data-v="${k}">${t}</button>`).join('')}</div>
-    <div class="card">
-      ${list.length ? list.map(n => `<div class="note">
-        <div class="row between">
-          ${n.kind === 'word'
-            ? `<div><span class="ko">${esc(n.ko)}</span> <span class="meta">${esc(n.vi)}</span></div>`
-            : `<div>${esc(n.text)}</div>`}
-          <button class="icon" data-act="delNote" data-id="${n.id}" aria-label="Xóa">🗑</button>
-        </div>
-        ${n.lessonId ? `<div class="hint">${esc(lessonName(n.lessonId))}</div>` : ''}
-      </div>`).join('') : '<p class="empty">Chưa có gì trong sổ từ.</p>'}
-    </div>`;
+
+    <div class="nfilter">
+      <div class="chips">${[['all', 'Tất cả', 'chip-teal'], ['word', 'Từ đã lưu', 'chip-pink'], ['note', 'Ghi chú', 'chip-yellow']]
+        .map(([k, t, c]) => `<button class="nchip ${c} ${ui.notesFilter === k ? 'on' : ''}" data-act="notesFilter" data-v="${k}">${t} · ${counts[k]}</button>`).join('')}</div>
+      <input id="noteSearch" class="nsearch" placeholder="Tìm trong sổ từ…" value="${esc(ui.noteQuery)}">
+    </div>
+    <div id="noteList">${noteListHTML()}</div>`;
+  const si = $('#noteSearch');
+  si.oninput = e => { ui.noteQuery = e.target.value; $('#noteList').innerHTML = noteListHTML(); };
 }
 function addNote(){
-  const text = $('#noteText').value.trim();
-  if(!text){ toast('Viết nội dung trước'); return; }
-  state.notes.unshift({id: 'N' + Date.now().toString(36), kind: 'note', text, lessonId: $('#noteLesson').value || null, at: Date.now()});
+  const tab = ui.noteTab || 'word';
+  const text = $('#nText') ? $('#nText').value.trim() : '';
+  const lessonId = $('#nLesson') ? $('#nLesson').value : '';
+  const id = 'N' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  if(tab === 'word'){
+    const ko = $('#nKo').value.trim(), vi = $('#nVi').value.trim();
+    if(!HANGUL.test(ko)){ toast('Nhập từ tiếng Hàn trước'); return; }
+    state.notes.unshift({id, kind: 'word', wordId: 'c' + id, lessonId: lessonId || null, ko, vi, text, at: Date.now()});
+  } else {
+    if(!text){ toast('Viết nội dung trước'); return; }
+    state.notes.unshift({id, kind: 'note', lessonId: lessonId || null, text, at: Date.now()});
+  }
   save();
   toast('Đã thêm vào sổ từ');
   render();
 }
 
-/* ============ THỐNG KÊ ============ */
-function renderStats(main){
-  const words = state.lessons.flatMap(l => l.words);
-  const known = words.filter(w => lvl(w.id) === 2).length;
-  const qr = words.reduce((n, w) => n + (prog(w.id).qr || 0), 0);
-  const qw = words.reduce((n, w) => n + (prog(w.id).qw || 0), 0);
-  const acc = qr + qw ? Math.round(100 * qr / (qr + qw)) + '%' : 'Chưa làm';
-  const stat = (l, v, s = '') => `<div class="stat"><div class="l">${l}</div><div class="v">${v}${s ? ` <small>${s}</small>` : ''}</div></div>`;
-  main.innerHTML = `
-    <div class="crumb">Thống kê</div>
-    <h1>Thống kê</h1>
-    <p class="sub">Tiến độ học của bạn trên tất cả các bài.</p>
-    <div class="grid4" style="margin:18px 0">
-      ${stat('Số bài', state.lessons.length)}
-      ${stat('Tổng số từ', words.length)}
-      ${stat('Đã nhớ', words.length ? Math.round(100 * known / words.length) + '%' : '0%', `${known} từ`)}
-      ${stat('Trắc nghiệm đúng', acc, qr + qw ? `${qr}/${qr + qw}` : '')}
-    </div>
-    <div class="card">
-      <h2>Theo từng bài</h2>
-      ${state.lessons.length ? `<table class="words"><thead><tr><th>Bài</th><th>Từ</th><th>Đã nhớ</th><th style="width:30%">Tiến độ</th></tr></thead><tbody>
-        ${state.lessons.map(l => `<tr>
-          <td><a href="#/lesson/${l.id}/overview">${esc(l.name)}</a><div class="meta">${esc(l.folder)}</div></td>
-          <td>${l.words.length}</td>
-          <td>${lessonPct(l)}%</td>
-          <td><div class="track"><div class="fill ok" style="width:${lessonPct(l)}%"></div></div></td>
-        </tr>`).join('')}</tbody></table>` : '<p class="empty">Chưa có bài nào.</p>'}
-    </div>`;
-}
-
-/* ============ TRANG CHUNG & HỘP THOẠI ============ */
-function emptyPage(text){
-  return `<div class="card empty"><p>${text}</p><a class="btn" href="#/home">Tạo bài học</a></div>`;
-}
 function openDialog(title, body, onOk){
   const d = $('#dlg');
   d.innerHTML = `<form class="dlgbox"><h2>${esc(title)}</h2>${body}
@@ -2171,6 +2400,7 @@ function act(name, d){
     case 'lesson': go(`#/lesson/${d.id}/${d.mode}`); break;
     case 'addNote': addNote(); break;
     case 'notesFilter': ui.notesFilter = d.v; render(); break;
+    case 'noteTab': ui.noteTab = d.v; render(); break;
     case 'delNote':
       if(confirm('Xóa mục này khỏi sổ từ?')){ state.notes = state.notes.filter(n => n.id !== d.id); save(); render(); }
       break;
