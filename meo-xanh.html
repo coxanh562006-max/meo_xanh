@@ -263,6 +263,59 @@
   .wcard3 .track{margin-top:8px}
   @media (max-width:1000px){ .fgrid{grid-template-columns:repeat(2,1fr)} .wgrid{grid-template-columns:repeat(3,1fr)} }
   @media (max-width:640px){ .fgrid,.wgrid{grid-template-columns:1fr} }
+  .vhead{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;background:#e3f4ee;border-radius:30px;padding:26px 30px;margin-bottom:16px}
+  .vhead h1{color:#1f5f4d;font-size:34px;margin:2px 0 6px}
+  .vhead p{margin:0;color:#3f7a66;font-size:16px}
+  .vkicker{font-size:14px;color:#2f8a6c;font-weight:600}
+  .vstats{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .vstats span{background:#fff;border-radius:16px;padding:9px 16px;font-size:14px;color:var(--muted)}
+  .vstats b{font-size:22px;margin-right:6px}
+  .vstats span:nth-child(1) b{color:#0e7c66}
+  .vstats span:nth-child(2) b{color:#6a4fc8}
+  .vstats span:nth-child(3) b{color:#c2396a}
+  .vdeco{position:relative;width:260px;height:150px;flex:none}
+  .vdeco span{position:absolute;border-radius:18px}
+  .vdeco .d1{left:10px;top:30px;width:150px;height:100px;background:#fbd6e2;transform:rotate(-8deg)}
+  .vdeco .d2{left:60px;top:18px;width:150px;height:100px;background:#fbeaa0;transform:rotate(-2deg)}
+  .vdeco .d3{left:110px;top:0;width:150px;height:110px;background:#fff;box-shadow:0 4px 0 #d9d1f6;transform:rotate(5deg);display:grid;place-content:center;text-align:center;padding:8px}
+  .vdeco .d3 b{font-size:24px;color:#4b3fa3}
+  .vdeco .d3 small{color:var(--muted)}
+  .vdeco .dcat{left:200px;top:98px;width:54px;height:48px;border-radius:18px;background:#fff;display:grid;place-items:center;box-shadow:0 3px 0 #bfe3d4}
+  .vbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .vchips{display:flex;gap:8px;flex-wrap:wrap}
+  .vchips .chip.on{background:#e3f4ee;color:#0e7c66;border-color:transparent}
+  .vsearch{max-width:340px;border-radius:999px;background:#fff}
+  .vfeat{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;background:#ece7fd;border-radius:30px;padding:24px;margin-bottom:16px}
+  .vfl{display:grid;gap:14px;align-content:start}
+  .vpill{justify-self:start;background:#fff;color:#6a4fc8;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+  .vfh{display:flex;gap:14px;align-items:center}
+  .vfic{width:64px;height:64px;border-radius:20px;background:#fff;color:#4b3fa3;display:grid;place-items:center}
+  .vfh h2{color:#3b2f8f;font-size:26px;margin:0 0 2px}
+  .vfp{display:flex;justify-content:space-between;color:#6a4fc8;font-size:14px;font-weight:600}
+  .vfp b{font-size:14px}
+  .vtrack{background:#fff;height:10px}
+  .vtrack .fill{background:#7c5cd6}
+  .vhoc{justify-self:start;background:#fff;color:#3b2f8f;border:0;box-shadow:0 3px 0 #d9d1f6;min-height:46px}
+  .vweeks{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start}
+  .vwk{background:#fff;border-radius:22px;padding:16px;text-decoration:none;color:var(--ink);display:grid;gap:10px;position:relative}
+  .vwk b{font-size:15px}
+  .vwk i{position:absolute;right:16px;bottom:14px;color:#6a4fc8;font-style:normal;font-size:18px}
+  .vwt{justify-self:start;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+  .vwt.tone0{background:#fbe6ee;color:#c2396a}
+  .vwt.tone1{background:#e5ecfb;color:#2f6fd0}
+  .vwt.tone2{background:#e3f4ea;color:#2f9e5b}
+  .vwt.tone3{background:#fdf3cf;color:#a8701a}
+  .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .vcard{position:relative;overflow:hidden;border-radius:28px;padding:22px;min-height:230px;text-decoration:none;color:var(--ink);display:grid;gap:8px;align-content:start}
+  .vci{width:50px;height:50px;border-radius:16px;background:#fff;display:grid;place-items:center;margin-bottom:8px}
+  .vcard b{font-size:19px}
+  .vcard small{font-size:14px;font-weight:600}
+  .vmore{position:absolute;right:16px;top:14px;width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.8);display:grid;place-items:center;color:var(--muted);font-size:18px}
+  .vseg{display:flex;gap:6px;margin-top:auto;padding-top:16px}
+  .vseg i{flex:1;height:8px;border-radius:999px}
+  .vopen{position:absolute;right:20px;bottom:18px;font-weight:700;font-size:15px}
+  @media (max-width:1000px){ .vgrid{grid-template-columns:repeat(2,1fr)} .vfeat{grid-template-columns:1fr} }
+  @media (max-width:640px){ .vgrid,.vweeks{grid-template-columns:1fr} .vdeco{display:none} }
   .kindrow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}
   .kindrow:last-of-type{border-bottom:0}
   .kindrow input{width:18px;height:18px;min-height:0;accent-color:var(--primary)}
@@ -1085,10 +1138,101 @@ function folderGridHTML(){
   }).join('');
   return `${vocabStatusHTML()}<div class="fgrid">${cards || '<div class="card empty">Chưa có môn nào.</div>'}</div>`;
 }
+const FOLDER_TONES = [['#fbe6ee', '#c2396a', 'doc'], ['#e5ecfb', '#2f6fd0', 'trans'], ['#e3f4ea', '#2f9e5b', 'book'], ['#fdeedd', '#c46a1a', 'doc'], ['#fdf3cf', '#a8701a', 'book']];
+function subjStats(s){
+  let total = 0, known = 0, touched = 0;
+  Object.keys(s.weeks).forEach(w => {
+    const l = vocabLesson(s.i, w);
+    if(!l) return;
+    l.words.forEach(x => {
+      total++;
+      if(lvl(x.id) === 2) known++;
+      if(state.progress[x.id]) touched++;
+    });
+  });
+  return {total, known, touched, weeks: Object.keys(s.weeks).length};
+}
+function vocabFoldersPage(){
+  const subs = vocab.subjects.map(s => ({s, st: subjStats(s)}));
+  const totalWords = subs.reduce((n, x) => n + x.st.total, 0);
+  const known = subs.reduce((n, x) => n + x.st.known, 0);
+  const f = ui.vocabFilter || 'all';
+  const q = (ui.vocabQuery || '').trim().toLowerCase();
+  const active = subs.filter(x => x.st.touched > 0);
+  const empty = subs.filter(x => x.st.total === 0);
+  let list = subs.filter(x => f === 'all' || (f === 'active' ? x.st.touched > 0 : x.st.total === 0));
+  if(q) list = list.filter(x => x.s.name.toLowerCase().includes(q) ||
+    Object.values(x.s.weeks).flat().some(w => w.ko.toLowerCase().includes(q) || (w.vi || '').toLowerCase().includes(q)));
+  const feat = [...active].sort((a, b) => b.st.touched - a.st.touched)[0] || subs.find(x => x.st.total > 0);
+  const showFeat = feat && list.includes(feat) && Object.keys(feat.s.weeks).length > 0;
+  const others = list.filter(x => !showFeat || x !== feat);
+  const fw = feat ? Object.keys(feat.s.weeks).map(Number).sort((a, b) => a - b) : [];
+  const fpct = feat && feat.st.total ? Math.round(100 * feat.st.known / feat.st.total) : 0;
+  const featHTML = showFeat ? `<section class="vfeat">
+      <div class="vfl">
+        <span class="vpill">Đang học</span>
+        <div class="vfh"><div class="vfic">${svgIcon('book', 30)}</div>
+          <div><h2>${esc(feat.s.name)}</h2><span class="meta">${fw.length} tuần · ${feat.st.total} từ</span></div></div>
+        <div class="vfp"><span>Tiến độ</span><b>${fpct}%</b></div>
+        <div class="track vtrack"><div class="fill" style="width:${fpct}%"></div></div>
+        <a class="btn vhoc" href="#/lesson/V_${feat.s.i}_${fw[0]}/flash">▷ Học tiếp</a>
+      </div>
+      <div class="vweeks">${fw.map((w, i) => `<a class="vwk" href="#/lesson/V_${feat.s.i}_${w}/overview">
+        <span class="vwt tone${i % 4}">Tuần ${w}</span><b>Xem bài</b><i>→</i></a>`).join('')}</div>
+    </section>` : '';
+  const cards = others.map((x, i) => {
+    const [bg, ink, ic] = FOLDER_TONES[i % FOLDER_TONES.length];
+    const n = x.st.total;
+    const filled = n ? Math.round(4 * x.st.known / n) : 0;
+    const segs = [0, 1, 2, 3].map(k => `<i style="background:${k < filled ? ink : 'rgba(255,255,255,.7)'}"></i>`).join('');
+    return `<a class="vcard" href="#/vocab/${x.s.i}" style="background:${bg}">
+      <span class="vmore" aria-hidden="true">⋯</span>
+      <div class="vci" style="color:${ink}">${svgIcon(ic, 22)}</div>
+      <b>${esc(x.s.name)}</b>
+      <small style="color:${ink}">${n ? `${x.st.weeks} tuần · ${n} từ` : 'Chưa có từ nào'}</small>
+      <div class="vseg">${segs}</div>
+      <span class="vopen" style="color:${ink}">Mở →</span>
+    </a>`;
+  }).join('');
+  return `<section class="vhead">
+      <div class="vhtxt">
+        <span class="vkicker">Từ vựng</span>
+        <h1>Thư mục từ vựng</h1>
+        <p>Chọn một thư mục (môn học) để xem các tuần.</p>
+        <div class="vstats"><span><b>${subs.length}</b> thư mục</span><span><b>${totalWords}</b> từ</span><span><b>${known}</b> từ đã nhớ</span></div>
+      </div>
+      <div class="vdeco" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"><b>단어</b><small>Từ vựng</small></span>
+        <span class="dcat"><svg viewBox="0 0 120 100" width="44" height="36"><use href="#cat"/></svg></span></div>
+    </section>
+    ${vocabStatusHTML()}
+    <div class="vbar">
+      <div class="vchips">
+        <button class="chip ${f === 'all' ? 'on' : ''}" data-act="vocabFilter" data-v="all">Tất cả · ${subs.length}</button>
+        <button class="chip ${f === 'active' ? 'on' : ''}" data-act="vocabFilter" data-v="active">Đang học · ${active.length}</button>
+        <button class="chip ${f === 'empty' ? 'on' : ''}" data-act="vocabFilter" data-v="empty">Chưa có từ · ${empty.length}</button>
+      </div>
+      <input id="vsearch" class="vsearch" placeholder="Tìm thư mục hoặc từ…" value="${esc(ui.vocabQuery || '')}">
+    </div>
+    ${featHTML}
+    <div class="vgrid">${cards || (featHTML ? '' : '<div class="card empty" style="grid-column:1/-1">Không có thư mục nào khớp.</div>')}</div>`;
+}
+function bindVocabSearch(){
+  const box = $('#vsearch');
+  if(!box) return;
+  box.oninput = e => {
+    ui.vocabQuery = e.target.value;
+    const pos = e.target.selectionStart;
+    renderVocab(document.querySelector('#main'), undefined);
+    const again = $('#vsearch');
+    again.focus();
+    again.setSelectionRange(pos, pos);
+  };
+}
 function renderVocab(main, si){
   const s = vocab.subjects[Number(si)];
   if(si === undefined){
-    main.innerHTML = `<div class="crumb">Từ vựng</div><h1>Từ vựng</h1><p class="sub">Chọn một môn để xem các tuần.</p>${folderGridHTML()}`;
+    main.innerHTML = vocabFoldersPage();
+    bindVocabSearch();
     return;
   }
   if(!s){
@@ -1247,6 +1391,7 @@ const ICON = {
   notes: '<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 8h6M9 12h6"/>',
   stats: '<path d="M6 20V11M12 20V6M18 20v-8"/>',
   grammar: '<path d="M4 6h10M9 6v12M14 12h6M17 9v6"/>',
+  trans: '<path d="M4 5h9M8.5 5v2M5 7c1.5 4 4 6 7 7M10 7c-.8 3-3 5-6 6"/><path d="M13 19l3-8 3 8M14 16h4"/>',
   vocab: '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16M9 5v14"/>',
   book: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h11"/>',
   smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/>',
@@ -2539,6 +2684,7 @@ function act(name, d){
   switch(name){
     case 'clearSlot': setSlotFile(d.v, null); break;
     case 'upload': go('#/new'); $('#fileInput').click(); break;
+    case 'vocabFilter': ui.vocabFilter = d.v; render(); break;
     case 'sideToggle': { const c = !isSideCollapsed(); try{ localStorage.setItem('meo-xanh-side', c ? '1' : '0'); } catch(e){} renderSide(route()); break; }
     case 'calToggle': ui.calFull = !ui.calFull; renderSide(route()); break;
     case 'quizCount': { const l = findLesson(route().id); if(l){ l.quizCount = +d.v; } ui.quiz = null; save(); render(); break; }
