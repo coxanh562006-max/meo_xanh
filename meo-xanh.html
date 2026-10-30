@@ -316,6 +316,27 @@
   .vopen{position:absolute;right:20px;bottom:18px;font-weight:700;font-size:15px}
   @media (max-width:1000px){ .vgrid{grid-template-columns:repeat(2,1fr)} .vfeat{grid-template-columns:1fr} }
   @media (max-width:640px){ .vgrid,.vweeks{grid-template-columns:1fr} .vdeco{display:none} }
+  .hgreet{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:18px;background:#e3f4ee;border-radius:30px;padding:26px 30px;margin-bottom:16px}
+  .hgl{position:relative;z-index:1;display:grid;gap:8px;justify-items:start}
+  .hgdate{font-size:14px;color:#2f8a6c;font-weight:600}
+  .hgreet h1{color:#1f5f4d;font-size:30px;margin:0}
+  .hgreet p{margin:0;color:#3f7a66;font-size:16px}
+  .hgreet p b{color:#1f5f4d}
+  .hgbubble{position:absolute;right:-20px;top:-6px;background:#fff;color:#c2396a;border-radius:16px;padding:8px 14px;font-weight:700;font-size:15px;box-shadow:0 3px 0 #f6c6da}
+  .hgcat{width:150px;height:130px;border-radius:40px;background:#fff;display:grid;place-items:center;flex:none;box-shadow:0 4px 0 #bfe3d4}
+  .hstats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+  .hsc{border-radius:26px;padding:20px 22px;display:flex;gap:16px;align-items:center}
+  .hsc.orange{background:#fdeedd}
+  .hsc.purple{background:#ece7fd}
+  .hsi{width:52px;height:52px;border-radius:18px;background:#fff;display:grid;place-items:center;flex:none}
+  .hsc b{display:block;font-size:26px;line-height:1.1}
+  .hsc.orange b{color:#c46a1a}
+  .hsc.purple b{color:#6a4fc8}
+  .hsc span{font-size:14px;color:var(--muted)}
+  .vsec{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+  .vsec h2{margin:0;font-size:22px}
+  .vsec p{margin:2px 0 0;color:var(--muted);font-size:14px}
+  @media (max-width:860px){ .hstats{grid-template-columns:1fr} .hgcat{display:none} }
   .kindrow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}
   .kindrow:last-of-type{border-bottom:0}
   .kindrow input{width:18px;height:18px;min-height:0;accent-color:var(--primary)}
@@ -1152,7 +1173,7 @@ function subjStats(s){
   });
   return {total, known, touched, weeks: Object.keys(s.weeks).length};
 }
-function vocabFoldersPage(){
+function vocabFoldersPage(mode = 'page'){
   const subs = vocab.subjects.map(s => ({s, st: subjStats(s)}));
   const totalWords = subs.reduce((n, x) => n + x.st.total, 0);
   const known = subs.reduce((n, x) => n + x.st.known, 0);
@@ -1194,16 +1215,35 @@ function vocabFoldersPage(){
       <span class="vopen" style="color:${ink}">Mở →</span>
     </a>`;
   }).join('');
-  return `<section class="vhead">
-      <div class="vhtxt">
-        <span class="vkicker">Từ vựng</span>
-        <h1>Thư mục từ vựng</h1>
-        <p>Chọn một thư mục (môn học) để xem các tuần.</p>
-        <div class="vstats"><span><b>${subs.length}</b> thư mục</span><span><b>${totalWords}</b> từ</span><span><b>${known}</b> từ đã nhớ</span></div>
+  const streak = streakCount();
+  const left = Math.max(0, 3 - streak);
+  const head = mode === 'home'
+    ? `<section class="hgreet">
+        <div class="hgl">
+          <span class="hgdate">${esc(new Date().toLocaleDateString('vi-VN', {weekday: 'long', day: '2-digit', month: '2-digit'}))}</span>
+          <h1>Chào bạn, học chút nhé!</h1>
+          <p>${feat ? `Bạn đang học dở <b>${esc(feat.s.name)}</b>. Mở lại để học tiếp từ chỗ cũ nhé.` : 'Chọn một thư mục để bắt đầu học.'}</p>
+          ${feat ? `<a class="btn vhoc" href="#/lesson/V_${feat.s.i}_${fw[0]}/flash">▷ Học tiếp</a>` : ''}
+          <span class="hgbubble">화이팅!</span>
+        </div>
+        <div class="hgcat" aria-hidden="true"><svg viewBox="0 0 120 100" width="120" height="100"><use href="#cat"/></svg></div>
+      </section>
+      <div class="hstats">
+        <div class="hsc orange"><div class="hsi">${svgIcon('flame', 26)}</div><div><b>${streak} ngày</b><span>Chuỗi học · ${left > 0 ? `thêm ${left} ngày là có huy hiệu` : 'đã đạt huy hiệu Chuỗi 3 ngày'}</span></div></div>
+        <div class="hsc purple"><div class="hsi">${svgIcon('card', 26)}</div><div><b>${totalWords} từ</b><span>Từ vựng · ${known} từ đã nhớ</span></div></div>
       </div>
-      <div class="vdeco" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"><b>단어</b><small>Từ vựng</small></span>
-        <span class="dcat"><svg viewBox="0 0 120 100" width="44" height="36"><use href="#cat"/></svg></span></div>
-    </section>
+      <div class="vsec"><h2>Thư mục từ vựng</h2><p>Chọn một thư mục (môn học) để xem các tuần</p></div>`
+    : `<section class="vhead">
+        <div class="vhtxt">
+          <span class="vkicker">Từ vựng</span>
+          <h1>Thư mục từ vựng</h1>
+          <p>Chọn một thư mục (môn học) để xem các tuần.</p>
+          <div class="vstats"><span><b>${subs.length}</b> thư mục</span><span><b>${totalWords}</b> từ</span><span><b>${known}</b> từ đã nhớ</span></div>
+        </div>
+        <div class="vdeco" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"><b>단어</b><small>Từ vựng</small></span>
+          <span class="dcat"><svg viewBox="0 0 120 100" width="44" height="36"><use href="#cat"/></svg></span></div>
+      </section>`;
+  return `${head}
     ${vocabStatusHTML()}
     <div class="vbar">
       <div class="vchips">
@@ -1222,7 +1262,8 @@ function bindVocabSearch(){
   box.oninput = e => {
     ui.vocabQuery = e.target.value;
     const pos = e.target.selectionStart;
-    renderVocab(document.querySelector('#main'), undefined);
+    document.querySelector('#main').innerHTML = vocabFoldersPage(route().name === 'home' ? 'home' : 'page');
+    bindVocabSearch();
     const again = $('#vsearch');
     again.focus();
     again.setSelectionRange(pos, pos);
@@ -1231,7 +1272,7 @@ function bindVocabSearch(){
 function renderVocab(main, si){
   const s = vocab.subjects[Number(si)];
   if(si === undefined){
-    main.innerHTML = vocabFoldersPage();
+    main.innerHTML = vocabFoldersPage('page');
     bindVocabSearch();
     return;
   }
@@ -1382,6 +1423,7 @@ const ICON = {
   card: '<rect x="4" y="6" width="13" height="12" rx="2"/><path d="M8 3h11v12"/>',
   keys: '<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 11h.01M10 11h.01M13 11h.01M16 11h.01M8 14h8"/>',
   pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>',
+  flame: '<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2.5-4.5.5 2 1.5 3 2 3.5C11.5 9.5 11.8 6 12 3z"/>',
   bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6h5.4c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/>',
   check: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6M8.5 12l2.5 2.5L16 10"/>',
   grid: '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
@@ -1411,10 +1453,8 @@ const MODE_CARDS = [
   ['check', 'Kiểm tra', '#dfeafc', '#2f6fd0', 'Trắc nghiệm · đúng/sai · tự luận']
 ];
 function renderHome(main){
-  main.innerHTML = `<div class="hhead"><div class="hicon">${svgIcon('spark', 30)}</div>
-      <div><h1>Trang chủ</h1><p class="sub">Chọn một thư mục (môn học) để xem các tuần.</p></div></div>
-    <h3 class="step">Thư mục từ vựng</h3>
-    ${folderGridHTML()}`;
+  main.innerHTML = vocabFoldersPage('home');
+  bindVocabSearch();
 }
 function renderNew(main){
   const d = newDraft();
