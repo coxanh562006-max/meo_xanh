@@ -283,6 +283,62 @@
   .vbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
   .vchips{display:flex;gap:8px;flex-wrap:wrap}
   .vchips .chip.on{background:#e3f4ee;color:#0e7c66;border-color:transparent}
+  .shero{position:relative;overflow:hidden;background:#ece7fd;border-radius:30px;padding:24px 28px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+  .sring{position:relative;width:150px;height:150px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+  .sring svg{position:absolute;inset:0}
+  .src{position:relative;text-align:center;display:grid}
+  .src b{font-size:34px;color:#3d2f8f;line-height:1}
+  .src span{font-size:14px;color:#6a5fb0}
+  .shtxt{flex:1;min-width:240px;display:grid;gap:6px}
+  .shtxt .crumb{color:#6a4fc8;font-size:14px}
+  .shtxt h1{margin:0;color:#3d2f8f;font-size:36px}
+  .shtxt p{margin:0;color:#6a5fb0}
+  .sstats{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .sstats span{background:#fff;border-radius:16px;padding:10px 16px;color:#5a4fa0;font-size:14px}
+  .sstats b{font-size:20px;margin-right:6px;color:#3d2f8f}
+  .sstats .rose b{color:#c2396a}
+  .sstats .green b{color:#2f9e5b}
+  .shact{display:grid;gap:10px;align-self:center}
+  .slhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:6px 0 4px}
+  .slhead h2{margin:0;font-size:22px}
+  .slhead p{margin:2px 0 0;color:var(--muted);font-size:14px}
+  .sact2{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .sfind{max-width:340px;width:100%}
+  .stl{position:relative;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:16px;margin-top:14px}
+  .stl::before{content:'';position:absolute;left:10%;right:10%;top:50%;border-top:2px dashed #e4dccd}
+  .tlnode{position:relative;justify-self:center;width:56px;height:56px;border-radius:50%;background:#fff;border:3px solid;display:grid;place-items:center;font-weight:700;font-size:20px}
+  .tlnode.t0{border-color:#f0b8cc;color:#c2396a}
+  .tlnode.t1{border-color:#b9cdf0;color:#2f6fd0}
+  .tlnode.t2{border-color:#f0dc8a;color:#a8701a}
+  .tlnode.t3{border-color:#b8e3cd;color:#2f9e5b}
+  .swks{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:16px;margin-top:12px}
+  .swk{position:relative;overflow:hidden;border-radius:26px;padding:20px;display:grid;gap:12px;align-content:start}
+  .swk::after{content:'';position:absolute;right:-34px;top:-34px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.4)}
+  .swtop{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+  .swtag{background:#fff;color:inherit;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+  .swtag.warm{color:#c2396a}
+  .swbig{position:relative;z-index:1;display:flex;align-items:baseline;gap:6px}
+  .swbig b{font-size:46px;line-height:1;color:#2a2f2e}
+  .swbig span{font-size:18px;font-weight:700}
+  .swdots{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:5px}
+  .swdots i{width:9px;height:9px;border-radius:50%;background:#fff;display:block}
+  .swdots i.on{background:currentColor}
+  .swmeta{position:relative;z-index:1;display:flex;justify-content:space-between;font-weight:700;font-size:14px}
+  .swk .track{position:relative;z-index:1;background:rgba(255,255,255,.85)}
+  .swact{position:relative;z-index:1;display:flex;gap:8px;align-items:center}
+  .swact .btn{flex:1;justify-content:center;background:#fff;color:inherit;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+  .swic{width:42px;height:42px;border-radius:14px;background:#fff;color:inherit;display:grid;place-items:center;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+  .sbar{margin-top:16px}
+  .sbar .stack{height:28px;border-radius:14px;margin:14px 0 12px}
+  .sfound{margin-top:12px}
+  @media (max-width:860px){
+    .stl{display:none}
+    .swks{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:520px){
+    .swks{grid-template-columns:1fr}
+    .shero{padding:20px}
+  }
   .vsearch{max-width:340px;border-radius:999px;background:#fff}
   .vfeat{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;background:#ece7fd;border-radius:30px;padding:24px;margin-bottom:16px}
   .vfl{display:grid;gap:14px;align-content:start}
@@ -1216,12 +1272,15 @@ function vocabLesson(si, w){
   const key = si + '_' + w;
   if(vocabLessonCache[key]) return vocabLessonCache[key];
   const subj = vocab.subjects[Number(si)];
-  const list = subj && subj.weeks[String(w)];
-  if(!list) return null;
+  if(!subj) return null;
+  const groups = w === 'all'
+    ? Object.keys(subj.weeks).map(k => [k, subj.weeks[k]])
+    : subj.weeks[String(w)] ? [[String(w), subj.weeks[String(w)]]] : null;
+  if(!groups) return null;
   const l = {
-    id: 'V_' + key, virtual: true, folder: subj.name, name: `Tuần ${w}`, createdAt: 0,
+    id: 'V_' + key, virtual: true, folder: subj.name, name: w === 'all' ? 'Cả môn' : `Tuần ${w}`, createdAt: 0,
     modes: {...DEFAULT_MODES}, quizCount: 20, files: {}, sentences: [],
-    words: list.map((x, i) => ({id: `v${si}_${w}_${i}`, ko: x.ko, vi: x.vi, pos: x.pos, note: x.note, ex: x.ex}))
+    words: groups.flatMap(([wk, list]) => list.map((x, i) => ({id: `v${si}_${wk}_${i}`, ko: x.ko, vi: x.vi, pos: x.pos, note: x.note, ex: x.ex})))
   };
   vocabLessonCache[key] = l;
   return l;
@@ -1345,6 +1404,7 @@ function vocabFoldersPage(mode = 'page'){
         <button class="chip ${f === 'empty' ? 'on' : ''}" data-act="vocabFilter" data-v="empty">Chưa có từ · ${empty.length}</button>
       </div>
       <input id="vsearch" class="vsearch" placeholder="Tìm thư mục hoặc từ…" value="${esc(ui.vocabQuery || '')}">
+      ${vRefreshBtn()}
     </div>
     ${featHTML}
     <div class="vgrid">${cards || (featHTML ? '' : '<div class="card empty" style="grid-column:1/-1">Không có thư mục nào khớp.</div>')}</div>`;
@@ -1362,6 +1422,94 @@ function bindVocabSearch(){
     again.setSelectionRange(pos, pos);
   };
 }
+// Nút cập nhật sheet dùng chung cho trang thư mục và trang từng môn
+function vRefreshBtn(){
+  const at = vocab.at ? 'Cập nhật lúc ' + new Date(vocab.at).toLocaleString('vi-VN') : 'Chưa cập nhật';
+  return `<button class="ghost" data-act="vRefresh" title="${esc(at)}">Cập nhật từ sheet</button>`;
+}
+async function vRefreshNow(){
+  toast('Đang đọc sheet từ vựng…');
+  await loadVocab();
+  toast(vocab.status === 'ok' ? 'Đã cập nhật từ vựng' : 'Không đọc được sheet, đang dùng dữ liệu đã lưu');
+  render();
+}
+const WEEK_TONES = [['#fbe6ee', '#c2396a'], ['#e5ecfb', '#2f6fd0'], ['#fdf3cf', '#a8701a'], ['#e3f4ea', '#2f9e5b']];
+// Tìm từ trong một môn, hiện kết quả ngay khi gõ
+function subjFind(si, q){
+  const box = document.getElementById('wfindRes');
+  const s = vocab.subjects[Number(si)];
+  if(!box || !s) return;
+  q = q.trim().toLowerCase();
+  if(!q){ box.innerHTML = ''; return; }
+  const hits = [];
+  Object.keys(s.weeks).forEach(w => s.weeks[w].forEach(x => { if((x.ko + ' ' + x.vi).toLowerCase().includes(q)) hits.push({w, x}); }));
+  box.innerHTML = `<div class="card sfound"><h2>${hits.length} kết quả</h2>
+    ${hits.slice(0, 40).map(h => `<div class="hrow">
+      <span class="badge">Tuần ${h.w}</span>
+      <div class="hbody"><div class="ko">${esc(h.x.ko)}</div><div class="meta">${esc(h.x.vi)}</div></div>
+      <a class="ghost" href="#/lesson/V_${s.i}_${h.w}/overview">Mở tuần</a>
+    </div>`).join('')}
+    ${hits.length > 40 ? '<p class="meta">Chỉ hiện 40 kết quả đầu.</p>' : ''}</div>`;
+}
+function subjectPage(s){
+  const weeks = Object.keys(s.weeks).map(Number).sort((a, b) => a - b);
+  const rows = weeks.map((w, i) => {
+    const l = vocabLesson(s.i, w);
+    const n = s.weeks[w].length;
+    const known = l.words.filter(x => lvl(x.id) === 2).length;
+    return {w, n, known, pct: n ? Math.round(100 * known / n) : 0, l, tone: WEEK_TONES[i % WEEK_TONES.length]};
+  });
+  const total = rows.reduce((n, r) => n + r.n, 0);
+  const knownAll = rows.reduce((n, r) => n + r.known, 0);
+  const pct = total ? Math.round(100 * knownAll / total) : 0;
+  const todo = rows.find(r => r.known < r.n);
+  const cols = `style="--n:${rows.length}"`;
+  return `<section class="shero">
+      <div class="sring">${pct ? donut(pct, 150, 14, '#6a4fc8', '#ffffff') : ''}
+        <div class="src"><b>${pct}%</b><span>đã nhớ</span></div></div>
+      <div class="shtxt">
+        <div class="crumb"><a href="#/home">Trang chủ</a> / <a href="#/vocab">Từ vựng</a> / ${esc(s.name)}</div>
+        <h1>${esc(s.name)}</h1>
+        <p>Bấm vào một tuần để bắt đầu học.</p>
+        <div class="sstats"><span><b>${rows.length}</b>tuần</span><span class="rose"><b>${total}</b>từ</span><span class="green"><b>${knownAll}</b>đã nhớ</span></div>
+      </div>
+      <div class="shact">
+        ${rows.length ? `<a class="btn" href="#/lesson/V_${s.i}_${rows[0].w}/flash">▷ Học Tuần ${rows[0].w}</a>` : ''}
+        <a class="btn ghost" href="#/lesson/V_${s.i}_all/flash">⇄ Ôn trộn cả môn</a>
+      </div>
+    </section>
+    ${vocabStatusHTML()}
+    <div class="slhead">
+      <div><h2>Lộ trình các tuần</h2><p>Học lần lượt từng tuần, mỗi tuần một màu</p></div>
+      <div class="sact2">
+        <input class="vsearch sfind" placeholder="Tìm từ trong môn…" oninput="subjFind(${s.i}, this.value)">
+        ${vRefreshBtn()}
+      </div>
+    </div>
+    <div id="wfindRes"></div>
+    ${rows.length ? `<div class="stl" ${cols}>${rows.map(r => `<span class="tlnode t${rows.indexOf(r) % 4}">${r.w}</span>`).join('')}</div>
+    <div class="swks" ${cols}>${rows.map(r => {
+      const [bg, ink] = r.tone;
+      const dots = r.l.words.map(x => `<i class="${lvl(x.id) === 2 ? 'on' : ''}"></i>`).join('');
+      return `<div class="swk" style="background:${bg};color:${ink}">
+        <div class="swtop"><span class="swtag">Tuần ${r.w}</span>${todo === r ? '<span class="swtag warm">Nên học trước</span>' : ''}</div>
+        <div class="swbig"><b>${r.n}</b><span>từ</span></div>
+        <div class="swdots">${dots}</div>
+        <div class="swmeta"><span>${r.known}/${r.n} đã nhớ</span><span>${r.pct}%</span></div>
+        <div class="track"><div class="fill" style="width:${r.pct}%;background:${ink}"></div></div>
+        <div class="swact">
+          <a class="btn" href="#/lesson/V_${s.i}_${r.w}/flash">▷ Học</a>
+          <a class="swic" href="#/lesson/V_${s.i}_${r.w}/flash" title="Flashcard">${svgIcon('doc', 18)}</a>
+          <a class="swic" href="#/lesson/V_${s.i}_${r.w}/quiz" title="Kiểm tra">${svgIcon('check', 18)}</a>
+        </div>
+      </div>`;
+    }).join('')}</div>
+    <div class="card sbar">
+      <div class="row between"><h2 style="margin:0">Số từ mỗi tuần</h2><span class="meta">Tổng ${total} từ</span></div>
+      <div class="stack">${rows.map(r => `<i style="width:${total ? (100 * r.n / total).toFixed(2) : 0}%;background:${r.tone[0]}"></i>`).join('')}</div>
+      <div class="legend">${rows.map(r => `<span><i style="background:${r.tone[1]}"></i>Tuần ${r.w} · ${r.n} từ</span>`).join('')}</div>
+    </div>` : '<div class="card empty">Môn này chưa có từ nào trong sheet.</div>'}`;
+}
 function renderVocab(main, si){
   const s = vocab.subjects[Number(si)];
   if(si === undefined){
@@ -1373,22 +1521,7 @@ function renderVocab(main, si){
     main.innerHTML = `<div class="crumb">Từ vựng</div><h1>Từ vựng</h1>${vocabStatusHTML() || '<div class="card empty">Chưa có môn nào.</div>'}`;
     return;
   }
-  const weeks = Object.keys(s.weeks).map(Number).sort((a, b) => a - b);
-  const total = weeks.reduce((n, w) => n + s.weeks[w].length, 0);
-  main.innerHTML = `<div class="crumb"><a href="#/home">Trang chủ</a> / Từ vựng</div>
-    <h1>${esc(s.name)}</h1>
-    <p class="sub">${weeks.length} tuần · ${total} từ. Bấm vào một tuần để học.</p>
-    ${vocabStatusHTML()}
-    <div class="wgrid">${weeks.map(w => {
-      const l = vocabLesson(s.i, w);
-      const known = l ? l.words.filter(x => lvl(x.id) === 2).length : 0;
-      const n = s.weeks[w].length;
-      return `<a class="wcard3" href="#/lesson/V_${s.i}_${w}/overview">
-        <span class="wnum">Tuần ${w}</span><b>${n} từ</b><span class="meta">${known}/${n} đã nhớ</span>
-        <div class="track"><div class="fill" style="width:${n ? Math.round(100 * known / n) : 0}%"></div></div>
-      </a>`;
-    }).join('')}</div>
-    ${weeks.length ? '' : '<div class="card empty">Môn này chưa có từ nào trong sheet.</div>'}`;
+  main.innerHTML = subjectPage(s);
 }
 
 /* ============ ĐIỀU HƯỚNG ============ */
@@ -2824,6 +2957,7 @@ function act(name, d){
     case 'clearSlot': setSlotFile(d.v, null); break;
     case 'upload': go('#/new'); $('#fileInput').click(); break;
     case 'vocabFilter': ui.vocabFilter = d.v; render(); break;
+    case 'vRefresh': vRefreshNow(); break;
     case 'gJump': document.getElementById('g-' + d.v).scrollIntoView({behavior: 'smooth', block: 'start'}); break;
     case 'sideToggle': { const c = !isSideCollapsed(); try{ localStorage.setItem('meo-xanh-side', c ? '1' : '0'); } catch(e){} renderSide(route()); break; }
     case 'calToggle': ui.calFull = !ui.calFull; renderSide(route()); break;
