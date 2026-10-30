@@ -251,6 +251,18 @@
   .docprev td,.docprev th,.xlprev td,.xlprev th{border:1px solid var(--line);padding:6px 8px}
   .xlprev{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;overflow:auto;max-height:72vh;margin-bottom:16px}
   .txtprev{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;white-space:pre-wrap;max-height:72vh;overflow:auto;font-family:inherit}
+  .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px}
+  .fcard2{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;text-decoration:none;color:var(--ink);display:grid;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .fcard2:hover{border-color:#bfe3d4}
+  .fcard2 b{font-size:17px}
+  .fic{width:48px;height:48px;border-radius:16px;background:#e6f5f0;color:var(--teal-d);display:grid;place-items:center;margin-bottom:6px}
+  .wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px}
+  .wcard3{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;text-decoration:none;color:var(--ink);display:grid;gap:4px}
+  .wcard3:hover{border-color:#bfe3d4}
+  .wnum{font-size:13px;color:var(--teal-d);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .wcard3 .track{margin-top:8px}
+  @media (max-width:1000px){ .fgrid{grid-template-columns:repeat(2,1fr)} .wgrid{grid-template-columns:repeat(3,1fr)} }
+  @media (max-width:640px){ .fgrid,.wgrid{grid-template-columns:1fr} }
   .kindrow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}
   .kindrow:last-of-type{border-bottom:0}
   .kindrow input{width:18px;height:18px;min-height:0;accent-color:var(--primary)}
@@ -640,7 +652,12 @@ const lev = (a, b) => {
   }
   return prev[b.length];
 };
-const findLesson = id => (id && String(id).startsWith('G_')) ? grammarLesson(String(id).slice(2)) : state.lessons.find(l => l.id === id);
+const findLesson = id => {
+  const k = String(id || '');
+  if(k.startsWith('G_')) return grammarLesson(k.slice(2));
+  if(k.startsWith('V_')){ const [si, w] = k.slice(2).split('_'); return vocabLesson(si, w); }
+  return state.lessons.find(l => l.id === id);
+};
 const prog = id => state.progress[id] || {level: 0};
 const lvl = id => prog(id).level || 0;
 function markStudied(){
@@ -948,10 +965,160 @@ function grammarListView(l){
 // Tải lại sheet khi mở web; lỗi thì giữ dữ liệu có sẵn
 refreshGrammar().then(() => { if(route().name === 'lesson' && route().id.startsWith('G_')) render(); }).catch(() => {});
 
+/* ============ TỪ VỰNG (từ Google Sheet) ============
+   Mỗi tab trong sheet là một môn; cột STT là số tuần. Web đọc sheet mỗi lần mở.
+   Sheet phải để "Bất kỳ ai có đường liên kết đều xem được". */
+const VOCAB_SHEET_ID = '15bCofzNJUCFwC7puaajoM0mteCVfHpYdgCjKnl5AbFk';
+const VOCAB_FALLBACK_SHEETS = ['Tiếng hàn Tổng hợp ', 'Thực hành Biên dịch', 'Thực hành Phiên dịch', 'Tuần 4', 'Tuần 5', 'Tuần 6'];
+const vocab = {status: 'idle', subjects: [], at: 0};
+const vocabLessonCache = {};
+
+// Danh sách tên các tab; nếu không lấy được thì dùng danh sách có sẵn
+async function fetchSheetNames(){
+  try{
+    const r = await fetch(`https://spreadsheets.google.com/feeds/worksheets/${VOCAB_SHEET_ID}/public/basic?alt=json`);
+    if(!r.ok) throw new Error('feeds');
+    const j = await r.json();
+    const names = (j.feed.entry || []).map(e => e.title.$t);
+    if(names.length) return names;
+  }catch(e){}
+  return VOCAB_FALLBACK_SHEETS;
+}
+async function fetchSheetRows(name){
+  const url = `https://docs.google.com/spreadsheets/d/${VOCAB_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  const wb = XLSX.read(await r.text(), {type: 'string'});
+  return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, defval: ''});
+}
+// Đọc một tab: tìm hàng tiêu đề (có ô STT), rồi gom từ theo số tuần
+function parseVocabSheet(rows){
+  const cell = v => String(v ?? '').split(/\r?\n/).map(x => x.replace(/\s+/g, ' ').trim()).filter(Boolean).join(' · ');
+  const hdr = rows.findIndex(r => r.some(c => String(c).trim().toUpperCase() === 'STT'));
+  const weeks = {};
+  if(hdr < 0) return weeks;
+  const h = rows[hdr].map(c => String(c).trim());
+  const col = (pred, dflt) => { const i = h.findIndex(pred); return i >= 0 ? i : dflt; };
+  const cStt = col(x => x.toUpperCase() === 'STT', 0);
+  const cKo = col(x => x.includes('어휘'), 1);
+  const cPos = col(x => x.includes('종료') || x.includes('종류'), 2);
+  const cVi = col(x => x.includes('베트남어'), 3);
+  const cNote = col(x => x === '주의', 5);
+  const cEx = col(x => x.includes('보기'), 6);
+  let week = 0;
+  rows.slice(hdr + 1).forEach(r => {
+    const stt = parseInt(String(r[cStt] ?? '').trim(), 10);
+    if(!isNaN(stt)) week = stt;
+    const ko = cell(r[cKo]);
+    if(!week || !ko || !HANGUL.test(ko)) return;
+    const list = weeks[week] || (weeks[week] = []);
+    if(list.some(x => x.ko === ko)) return;
+    list.push({ko, vi: cell(r[cVi]), pos: cell(r[cPos]), note: cell(r[cNote]), ex: cell(r[cEx])});
+  });
+  return weeks;
+}
+async function loadVocab(){
+  vocab.status = 'loading';
+  try{
+    const names = await fetchSheetNames();
+    const subjects = [];
+    for(const name of names){
+      try{
+        const weeks = parseVocabSheet(await fetchSheetRows(name));
+        subjects.push({i: subjects.length, name: name.trim(), sheet: name, weeks});
+      }catch(e){
+        subjects.push({i: subjects.length, name: name.trim(), sheet: name, weeks: {}, error: e.message});
+      }
+    }
+    if(subjects.every(s => s.error)) throw new Error('không đọc được sheet');
+    vocab.subjects = subjects;
+    vocab.status = 'ok';
+    vocab.at = Date.now();
+    try{ localStorage.setItem('meo-xanh-vocab', JSON.stringify({at: vocab.at, subjects})); }catch(e){}
+  }catch(e){
+    vocab.status = 'error';
+    try{
+      const c = JSON.parse(localStorage.getItem('meo-xanh-vocab'));
+      if(c && c.subjects){ vocab.subjects = c.subjects; vocab.at = c.at; vocab.status = 'cache'; }
+    }catch(x){}
+  }
+  Object.keys(vocabLessonCache).forEach(k => delete vocabLessonCache[k]);
+}
+// Một tuần của một môn thành "bài" ảo, dùng lại mọi chức năng học
+function vocabLesson(si, w){
+  const key = si + '_' + w;
+  if(vocabLessonCache[key]) return vocabLessonCache[key];
+  const subj = vocab.subjects[Number(si)];
+  const list = subj && subj.weeks[String(w)];
+  if(!list) return null;
+  const l = {
+    id: 'V_' + key, virtual: true, folder: subj.name, name: `Tuần ${w}`, createdAt: 0,
+    modes: {...DEFAULT_MODES}, quizCount: 20, files: {}, sentences: [],
+    words: list.map((x, i) => ({id: `v${si}_${w}_${i}`, ko: x.ko, vi: x.vi, pos: x.pos, note: x.note, ex: x.ex}))
+  };
+  vocabLessonCache[key] = l;
+  return l;
+}
+function vocabStatusHTML(){
+  if(vocab.status === 'loading') return '<div class="card meta">Đang đọc sheet từ vựng…</div>';
+  if(vocab.status === 'error') return '<div class="card meta">Không đọc được sheet từ vựng. Kiểm tra sheet đã bật "Bất kỳ ai có đường liên kết đều xem được".</div>';
+  if(vocab.status === 'cache') return `<div class="card meta">Đang dùng dữ liệu đã lưu (lúc ${new Date(vocab.at).toLocaleString('vi-VN')}).</div>`;
+  return '';
+}
+function vocabWeekBar(l, tab){
+  const si = l.id.slice(2).split('_')[0];
+  const s = vocab.subjects[Number(si)];
+  if(!s) return '';
+  return `<div class="chips" style="margin-bottom:6px">${Object.keys(s.weeks).map(Number).sort((a, b) => a - b)
+    .map(w => `<a class="chip ${l.id === 'V_' + si + '_' + w ? 'on' : ''}" href="#/lesson/V_${si}_${w}/${tab}">Tuần ${w}</a>`).join('')}</div>`;
+}
+// Thư mục = các môn trong sheet
+function folderGridHTML(){
+  const cards = vocab.subjects.map(s => {
+    const weeks = Object.keys(s.weeks).length;
+    const words = Object.values(s.weeks).reduce((n, a) => n + a.length, 0);
+    return `<a class="fcard2" href="#/vocab/${s.i}">
+      <div class="fic">${svgIcon('book', 24)}</div>
+      <b>${esc(s.name)}</b>
+      <span class="meta">${weeks} tuần · ${words} từ</span>
+    </a>`;
+  }).join('');
+  return `${vocabStatusHTML()}<div class="fgrid">${cards || '<div class="card empty">Chưa có môn nào.</div>'}</div>`;
+}
+function renderVocab(main, si){
+  const s = vocab.subjects[Number(si)];
+  if(si === undefined){
+    main.innerHTML = `<div class="crumb">Từ vựng</div><h1>Từ vựng</h1><p class="sub">Chọn một môn để xem các tuần.</p>${folderGridHTML()}`;
+    return;
+  }
+  if(!s){
+    main.innerHTML = `<div class="crumb">Từ vựng</div><h1>Từ vựng</h1>${vocabStatusHTML() || '<div class="card empty">Chưa có môn nào.</div>'}`;
+    return;
+  }
+  const weeks = Object.keys(s.weeks).map(Number).sort((a, b) => a - b);
+  const total = weeks.reduce((n, w) => n + s.weeks[w].length, 0);
+  main.innerHTML = `<div class="crumb"><a href="#/home">Trang chủ</a> / Từ vựng</div>
+    <h1>${esc(s.name)}</h1>
+    <p class="sub">${weeks.length} tuần · ${total} từ. Bấm vào một tuần để học.</p>
+    ${vocabStatusHTML()}
+    <div class="wgrid">${weeks.map(w => {
+      const l = vocabLesson(s.i, w);
+      const known = l ? l.words.filter(x => lvl(x.id) === 2).length : 0;
+      const n = s.weeks[w].length;
+      return `<a class="wcard3" href="#/lesson/V_${s.i}_${w}/overview">
+        <span class="wnum">Tuần ${w}</span><b>${n} từ</b><span class="meta">${known}/${n} đã nhớ</span>
+        <div class="track"><div class="fill" style="width:${n ? Math.round(100 * known / n) : 0}%"></div></div>
+      </a>`;
+    }).join('')}</div>
+    ${weeks.length ? '' : '<div class="card empty">Môn này chưa có từ nào trong sheet.</div>'}`;
+}
+
 /* ============ ĐIỀU HƯỚNG ============ */
 function route(){
   const p = location.hash.replace(/^#\/?/, '').split('/');
   if(p[0] === 'lesson' && p[1]) return {name: 'lesson', id: p[1], tab: p[2] || 'overview', sub: p[3] || 'word'};
+  if(p[0] === 'vocab') return {name: 'vocab', subj: p[1]};
+  if(p[0] === 'new') return {name: 'new'};
   if(['review', 'notes', 'stats'].includes(p[0])) return {name: p[0]};
   return {name: 'home'};
 }
@@ -985,6 +1152,8 @@ function render(){
   if(r.name === 'review') return renderFlashPage(main, null);
   if(r.name === 'notes') return renderNotes(main);
   if(r.name === 'stats') return renderStats(main);
+  if(r.name === 'vocab') return renderVocab(main, r.subj);
+  if(r.name === 'new') return renderNew(main);
 }
 
 function isSideCollapsed(){
@@ -1018,6 +1187,8 @@ function renderSide(r){
     ${r.id && String(r.id).startsWith('G_') ? weekNumbers().map(w => `<a class="lessonlink ${r.id === 'G_' + w ? 'on' : ''}" href="#/lesson/G_${w}/list">Tuần ${w}</a>`).join('') : ''}
     ${link('notes', 'Sổ từ của tôi')}
     ${link('stats', 'Thống kê')}
+    ${link('vocab', 'Từ vựng')}
+    ${(r.name === 'vocab' || (r.id && String(r.id).startsWith('V_'))) ? vocab.subjects.map(sj => `<a class="lessonlink ${(r.name === 'vocab' && String(r.subj) === String(sj.i)) || (r.id && String(r.id).startsWith('V_' + sj.i + '_')) ? 'on' : ''}" href="#/vocab/${sj.i}">${esc(sj.name)}</a>`).join('') : ''}
     <div class="sec">BÀI HỌC</div>
     <div class="lessonlist">${lessonLinks || '<div class="meta" style="padding:0 12px">Chưa có bài nào</div>'}</div>`;
 }
@@ -1080,6 +1251,7 @@ const ICON = {
   notes: '<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 8h6M9 12h6"/>',
   stats: '<path d="M6 20V11M12 20V6M18 20v-8"/>',
   grammar: '<path d="M4 6h10M9 6v12M14 12h6M17 9v6"/>',
+  vocab: '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16M9 5v14"/>',
   book: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h11"/>',
   smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/>',
   star: '<path d="M12 4l2.4 5 5.4.7-4 3.7 1 5.4L12 16.3 7.2 18.8l1-5.4-4-3.7 5.4-.7z"/>',
@@ -1087,7 +1259,7 @@ const ICON = {
 };
 const TAB_STYLE = {overview: ['#dff3ec', '#0e7c66', 'grid'], flash: ['#ece7fd', '#6a4fc8', 'card'], match: ['#fde4ef', '#c2396a', 'grid'],
   write: ['#dff4e7', '#2f9e5b', 'pen'], quiz: ['#dfeafc', '#2f6fd0', 'check'], source: ['#fdeedd', '#c46a1a', 'doc'], list: ['#ece7fd', '#6a4fc8', 'doc']};
-const NAV_STYLE = {home: ['#dff3ec', '#0e7c66'], notes: ['#fde7ef', '#c2396a'], stats: ['#e0ecfc', '#2f6fd0'], grammar: ['#ece7fd', '#6a4fc8']};
+const NAV_STYLE = {home: ['#dff3ec', '#0e7c66'], notes: ['#fde7ef', '#c2396a'], stats: ['#e0ecfc', '#2f6fd0'], grammar: ['#ece7fd', '#6a4fc8'], vocab: ['#fdeedd', '#c46a1a']};
 const navIcon = name => `<span class="ni" style="background:${NAV_STYLE[name][0]};color:${NAV_STYLE[name][1]}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name]}</svg></span>`;
 const svgIcon = (k, size = 26) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
 const MODE_CARDS = [
@@ -1098,6 +1270,17 @@ const MODE_CARDS = [
   ['check', 'Kiểm tra', '#dfeafc', '#2f6fd0', 'Trắc nghiệm · đúng/sai · tự luận']
 ];
 function renderHome(main){
+  const userLessons = [...state.lessons].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  main.innerHTML = `<div class="hhead"><div class="hicon">${svgIcon('spark', 30)}</div>
+      <div><h1>Trang chủ</h1><p class="sub">Chọn một thư mục (môn học) để xem các tuần.</p></div></div>
+    <h3 class="step">Thư mục từ vựng</h3>
+    ${folderGridHTML()}
+    ${userLessons.length ? `<h3 class="step">Bài học đã tải</h3><div class="rgrid">${userLessons.map(l => `<a class="rcard" href="#/lesson/${l.id}/overview">
+      <div class="row between"><strong>${esc(l.name)}</strong><span class="badge">${esc(l.folder)}</span></div>
+      <div class="meta" style="margin:6px 0 10px">${l.words.length} từ · đã học ${lessonPct(l)}%</div>
+      <div class="track"><div class="fill ok" style="width:${lessonPct(l)}%"></div></div></a>`).join('')}</div>` : ''}`;
+}
+function renderNew(main){
   const d = newDraft();
   const n = d.words ? d.words.length : 0;
   const hasVocab = !!d.files.vocab;
@@ -1216,9 +1399,9 @@ function renderLesson(main, r){
     ? [['list', 'Danh sách', true], ['flash', 'Flashcard', true], ['match', 'Ghép thẻ', true], ['write', 'Luyện viết', true], ['quiz', 'Kiểm tra', true]]
     : [['overview', 'Tổng quan', true], ['flash', 'Flashcard', m.flash], ['match', 'Ghép thẻ', true], ['write', 'Luyện viết', m.write || m.sent || m.ext],
       ['quiz', 'Kiểm tra', m.quiz], ['source', 'Tài liệu gốc', Object.keys(l.files || {}).length > 0]];
-  const weekBar = isG ? `<div class="chips" style="margin-bottom:6px">${[['all', 'Tất cả'], ...weekNumbers().map(w => [String(w), 'Tuần ' + w])]
+  const weekBar = l.virtual && !isG ? vocabWeekBar(l, r.tab) : isG ? `<div class="chips" style="margin-bottom:6px">${[['all', 'Tất cả'], ...weekNumbers().map(w => [String(w), 'Tuần ' + w])]
     .map(([k, t]) => `<a class="chip ${l.id === 'G_' + k ? 'on' : ''}" href="#/lesson/G_${k}/${r.tab}">${t}</a>`).join('')}</div>` : '';
-  const ownBtns = isG ? '' : `<button class="ghost" data-act="editLesson" data-id="${l.id}">Đổi tên</button>
+  const ownBtns = isG || l.virtual ? '' : `<button class="ghost" data-act="editLesson" data-id="${l.id}">Đổi tên</button>
         <button class="ghost" data-act="delLesson" data-id="${l.id}">Xóa bài</button>`;
   const known = l.words.filter(w => lvl(w.id) === 2).length;
   const primary = m.flash ? 'flash' : m.write ? 'write' : m.quiz ? 'quiz' : 'overview';
@@ -1275,7 +1458,7 @@ function overviewView(l){
         </div>
         <div id="ovTable"></div>
         <div class="row" style="margin-top:12px;justify-content:space-between">
-          <button class="ghost" data-act="addWord" data-id="${l.id}">+ Thêm từ</button>
+          ${l.virtual ? '' : `<button class="ghost" data-act="addWord" data-id="${l.id}">+ Thêm từ</button>`}
           <a href="#/lesson/${l.id}/flash" class="meta">Xem tất cả ${total} từ →</a>
         </div>
       </div>
@@ -1315,8 +1498,8 @@ function bindOverview(l){
         <td>${status(w)}</td>
         <td class="acts">
           <button class="icon" data-act="saveNote" data-id="${w.id}" aria-label="Lưu vào sổ từ" title="Lưu vào sổ từ">${state.notes.some(n => n.wordId === w.id) ? '★' : '☆'}</button>
-          <button class="icon" data-act="editWord" data-id="${w.id}" data-lesson="${l.id}" aria-label="Sửa từ">✎</button>
-          <button class="icon" data-act="delWord" data-id="${w.id}" data-lesson="${l.id}" aria-label="Xóa từ">🗑</button>
+          ${l.virtual ? '' : `<button class="icon" data-act="editWord" data-id="${w.id}" data-lesson="${l.id}" aria-label="Sửa từ">✎</button>
+          <button class="icon" data-act="delWord" data-id="${w.id}" data-lesson="${l.id}" aria-label="Xóa từ">🗑</button>`}
         </td></tr>`).join('')}</tbody></table>
       ${pager(list.length, ui.ovPage, PAGE_LIST, 'ovPage')}` : '<p class="empty">Không tìm thấy từ nào.</p>';
   };
@@ -2364,7 +2547,7 @@ function act(name, d){
   const r = route();
   switch(name){
     case 'clearSlot': setSlotFile(d.v, null); break;
-    case 'upload': $('#fileInput').click(); break;
+    case 'upload': go('#/new'); $('#fileInput').click(); break;
     case 'sideToggle': { const c = !isSideCollapsed(); try{ localStorage.setItem('meo-xanh-side', c ? '1' : '0'); } catch(e){} renderSide(route()); break; }
     case 'calToggle': ui.calFull = !ui.calFull; renderSide(route()); break;
     case 'quizCount': { const l = findLesson(route().id); if(l){ l.quizCount = +d.v; } ui.quiz = null; save(); render(); break; }
@@ -2588,7 +2771,7 @@ $('#fileInput').addEventListener('change', e => {
   e.target.value = '';
   if(!f) return;
   setSlotFile('vocab', f);
-  go('#/home');
+  go('#/new');
 });
 $('#pdfInput').addEventListener('change', async e => {
   const f = e.target.files[0];
@@ -2607,6 +2790,7 @@ $('#pdfInput').addEventListener('change', async e => {
 });
 
 render();
+loadVocab().then(() => render());
 </script>
 </body>
 </html>
