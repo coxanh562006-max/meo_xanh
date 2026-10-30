@@ -490,6 +490,8 @@
   .glist{min-width:0}
   .gitem{background:#fff;border-radius:28px;padding:22px;margin-bottom:16px;box-shadow:0 1px 0 #eef1f0}
   .gitem[hidden]{display:none}
+  .resume{text-align:center;display:grid;gap:10px;justify-items:center;padding:28px}
+  .resume p{margin:0;color:var(--muted)}
   .gihead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .gnum{width:30px;height:30px;border-radius:12px;display:grid;place-items:center;font-weight:700;flex:none}
   .gnum.c0{background:#ece7fd;color:#6a4fc8}
@@ -798,7 +800,8 @@ const ui = {
   wFilter: 'all', wDir: 'vi-ko', wTimer: null, sess: null,
   fl: null, wId: null, wRes: null, sId: null, sRes: null, eId: null, eRes: null,
   quiz: null, ovPage: 1, ovQuery: '', listPage: 1, notesFilter: 'all', noteQuery: '', noteTab: 'word',
-  draft: null, fileUrl: null, attachId: null
+  draft: null, fileUrl: null, attachId: null,
+  curKey: null, resumeAsk: {}, flPos: {}, wDone: {}
 };
 
 function load(){
@@ -1551,10 +1554,20 @@ document.addEventListener('pointerup', e => {
   }
 });
 
-window.addEventListener('hashchange', () => { ui.quiz = null; render(); window.scrollTo(0, 0); });
+window.addEventListener('hashchange', () => {
+  if(ui.curKey) ui.resumeAsk[ui.curKey] = true;
+  render();
+  window.scrollTo(0, 0);
+});
 
+// Các màn học có thể tiếp tục: Flashcard, Luyện viết, Kiểm tra
+function studyKey(r){
+  if(r.name !== 'lesson' || !['flash', 'write', 'quiz'].includes(r.tab)) return null;
+  return `${r.id}|${r.tab}|${r.sub || ''}`;
+}
 function render(){
   const r = route();
+  ui.curKey = studyKey(r);
   renderSide(r);
   const main = $('#main');
   if(r.name === 'home') return renderHome(main);
@@ -1912,10 +1925,11 @@ function bindOverview(l){
 /* ============ THẺ HỌC (dùng cho bài và Ôn tập) ============ */
 function flashBody(items, title){
   if(!items.length) return '<div class="card empty">Chưa có từ nào.</div>';
-  const key = location.hash + '|' + ui.onlyUnknown;
+  const key = route().id + '|' + ui.onlyUnknown;
   if(!ui.fl || ui.fl.key !== key){
-    ui.fl = {key, ids: items.filter(x => !ui.onlyUnknown || lvl(x.w.id) < 2).map(x => x.w.id), i: 0, flipped: false, items};
+    ui.fl = {key, ids: items.filter(x => !ui.onlyUnknown || lvl(x.w.id) < 2).map(x => x.w.id), i: ui.flPos[key] || 0, flipped: false, items};
   }
+  if(ui.flPos[key] && ui.curKey && ui.resumeAsk[ui.curKey]) return resumeCard('Bạn đang học dở', `Thẻ ${ui.flPos[key] + 1} / ${ui.fl.ids.length}.`);
   const byId = new Map(ui.fl.items.map(x => [x.w.id, x]));
   const ids = ui.fl.ids;
   const dirBar = `<div class="chips">
@@ -1928,6 +1942,7 @@ function flashBody(items, title){
       <div class="card empty"><p>Không còn thẻ nào chưa nhớ.</p><button data-act="onlyOff">Xem tất cả thẻ</button></div></div>`;
   }
   ui.fl.i = (ui.fl.i + ids.length) % ids.length;
+  ui.flPos[key] = ui.fl.i;
   const cur = byId.get(ids[ui.fl.i]);
   const w = cur.w;
   const front = ui.dir === 'ko-vi' ? w.ko : (w.vi || '(chưa có nghĩa)');
@@ -2093,13 +2108,17 @@ function wordSubmit(){
 }
 function writeWord(l, pool){
   if(!pool.length) return '<div class="card empty">Các từ trong bài chưa có nghĩa tiếng Việt.</div>';
-  const w = pickId(pool, 'wId');
+  const done = doneWords(l);
+  if(done.size && ui.curKey && ui.resumeAsk[ui.curKey]) return resumeCard('Bạn đang viết dở', `Đã làm ${done.size} / ${pool.length} từ.`);
+  const left = pool.filter(x => !done.has(x.id));
+  if(!left.length) return `<div class="card empty"><h2>Xong rồi!</h2><p>Bạn đã viết hết ${pool.length} từ.</p><button data-act="resumeGo" data-v="restart">Làm lại từ đầu</button></div>`;
+  const w = pickId(left, 'wId');
   const s = w.ko.replace(/\s/g, '');
   const toKo = ui.wDir === 'vi-ko';
   const prompt = toKo ? w.vi : w.ko;
   const ask = toKo ? 'Nhìn nghĩa, viết lại từ tiếng Hàn' : 'Nhìn từ tiếng Hàn, viết nghĩa tiếng Việt';
   const hint = toKo ? `<div class="meta" style="text-align:center">Gợi ý: ${s[0]} ${Array(s.length - 1).fill('_').join(' ')} (${s.length} chữ)</div>` : '';
-  const counter = `<span class="meta">${pool.indexOf(w) + 1} / ${pool.length}</span>`;
+  const counter = `<span class="meta">${pool.length - left.length + 1} / ${pool.length}</span>`;
   const promptHTML = `<div class="prompt ${toKo ? '' : 'ko'}">${esc(prompt)}</div>`;
   if(ui.ink){
     const actions = ui.reveal
@@ -2131,6 +2150,7 @@ function writeWord(l, pool){
 }
 function writeSent(l){
   const list = sentPool(l);
+  if(ui.sess && ui.sess.lesson === l.id && ui.sess.hist.length && ui.curKey && ui.resumeAsk[ui.curKey]) return resumeCard('Bạn đang viết dở', `Đã làm ${ui.sess.hist.length} / ${list.length} câu.`);
   if(!list.length) return l.grammar ? '<div class="card empty"><p>Chưa có câu ví dụ cho mục này.</p></div>' : `<div class="card empty">
     <p>Bài này chưa có file câu. Gắn file gồm mỗi dòng: <b>câu tiếng Hàn - nghĩa tiếng Việt</b>.</p>
     <button data-act="attachSent" data-id="${l.id}">Gắn file câu</button>
@@ -2414,8 +2434,41 @@ document.addEventListener('pointermove', e => {
   drawInk(c);
 });
 document.addEventListener('pointerup', () => { inkDrawing = false; });
+function doneWords(l){
+  if(!ui.wDone[l.id]) ui.wDone[l.id] = new Set();
+  return ui.wDone[l.id];
+}
+function markWordDone(){
+  const l = findLesson(route().id);
+  if(l && ui.wId) doneWords(l).add(ui.wId);
+}
+// Thẻ hỏi khi quay lại màn học đang dở
+function resumeCard(title, detail){
+  return `<div class="card resume"><h2>${title}</h2><p>${detail}</p>
+    <div class="row" style="justify-content:center;gap:10px">
+      <button data-act="resumeGo" data-v="continue">Tiếp tục</button>
+      <button class="ghost" data-act="resumeGo" data-v="restart">Làm lại từ đầu</button>
+    </div></div>`;
+}
+function resumeGo(v){
+  const k = ui.curKey;
+  const l = findLesson(route().id);
+  if(k) delete ui.resumeAsk[k];
+  if(v === 'restart' && l){
+    Object.keys(ui.flPos).filter(x => x.startsWith(l.id + '|')).forEach(x => delete ui.flPos[x]);
+    ui.fl = null;
+    ui.wDone[l.id] = new Set();
+    if(ui.sess && ui.sess.lesson === l.id) ui.sess = null;
+    ui.wId = null; ui.wRes = null;
+    resetInk();
+    ui.reveal = false;
+    if(route().tab === 'quiz'){ startQuiz(); return; }
+  }
+  render();
+}
 function nextInk(){
   clearTimeout(ui.wTimer);
+  markWordDone();
   ui.wId = null; ui.sId = null; ui.eId = null;
   ui.wRes = null; ui.sRes = null; ui.eRes = null;
   resetInk();
@@ -2475,6 +2528,7 @@ function testSetup(l){
 function quizView(l){
   const q = ui.quiz && ui.quiz.lesson === l.id ? ui.quiz : null;
   if(!q) return testSetup(l);
+  if(q.i < q.items.length && ui.curKey && ui.resumeAsk[ui.curKey]) return resumeCard('Bạn đang làm dở bài kiểm tra', `Câu ${q.i + 1} / ${q.items.length}, đúng ${q.score} câu.`);
   const cfg = testCfg(l);
   if(q.i >= q.items.length) return `<div class="card empty">
       <h2>Xong rồi!</h2>
@@ -2977,7 +3031,8 @@ function act(name, d){
     case 'dir': ui.dir = d.v; ui.fl.flipped = false; render(); break;
     case 'onlyOff': ui.onlyUnknown = false; render(); break;
     case 'saveNote': saveNote(d.id); break;
-    case 'wNext': ui.wId = null; ui.wRes = null; render(); break;
+    case 'wNext': markWordDone(); ui.wId = null; ui.wRes = null; render(); break;
+    case 'resumeGo': resumeGo(d.v); break;
     case 'attachSent': attachSent(d.id); break;
     case 'sReveal': ui.reveal = true; render(); break;
     case 'sRecord': sessRecord(ui.sess && ui.sess.cur, d.v === '1'); break;
