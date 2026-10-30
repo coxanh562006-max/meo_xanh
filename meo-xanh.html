@@ -1117,12 +1117,13 @@ function grammarListView(l){
   return `<div class="gtool">
       <div class="glegend"><span><i class="ex"></i>Ví dụ</span><span><i class="note"></i>Chú ý</span><span><i class="ext"></i>Mở rộng</span><span><i class="cmp"></i>So sánh</span></div>
       <input class="gsearch" type="search" placeholder="Tìm ngữ pháp…" oninput="gFilter(this.value)">
+      <button class="ghost" data-act="gRefresh" title="${esc(grammarStatus())}">Cập nhật từ sheet</button>
     </div>
     <div class="gwrap">
       <aside class="gindex"><b class="gilabel">Trong tuần này</b>${l.words.map((w, i) => `<button class="gidx" data-act="gJump" data-v="${i}"><span class="gnum c${i % 4}">${i + 1}</span><span>${esc(w.ko)}</span></button>`).join('')}</aside>
       <div class="glist">${cards || '<div class="card empty">Chưa có mẫu ngữ pháp nào.</div>'}</div>
     </div>
-    <div class="gstatus meta">${esc(grammarStatus())} <button class="ghost" data-act="gRefresh">Cập nhật từ sheet</button></div>`;
+    `;
 }
 function gFilter(q){
   q = q.trim().toLowerCase();
