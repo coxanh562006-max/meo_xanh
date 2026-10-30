@@ -1118,7 +1118,6 @@ function route(){
   const p = location.hash.replace(/^#\/?/, '').split('/');
   if(p[0] === 'lesson' && p[1]) return {name: 'lesson', id: p[1], tab: p[2] || 'overview', sub: p[3] || 'word'};
   if(p[0] === 'vocab') return {name: 'vocab', subj: p[1]};
-  if(p[0] === 'new') return {name: 'new'};
   if(['review', 'notes', 'stats'].includes(p[0])) return {name: p[0]};
   return {name: 'home'};
 }
@@ -1153,7 +1152,6 @@ function render(){
   if(r.name === 'notes') return renderNotes(main);
   if(r.name === 'stats') return renderStats(main);
   if(r.name === 'vocab') return renderVocab(main, r.subj);
-  if(r.name === 'new') return renderNew(main);
 }
 
 function isSideCollapsed(){
@@ -1180,17 +1178,15 @@ function renderSide(r){
       <a class="brand" href="#/home"><svg class="logo" viewBox="0 0 120 100" aria-hidden="true"><use href="#cat"/></svg><span class="lbl">Mèo xanh</span></a>
       <button class="sidetog" data-act="sideToggle" aria-label="Thu gọn thanh bên" title="Thu gọn / mở rộng">‹</button>
     </div>
-    <button class="newbtn" data-act="upload" title="Tải bài mới"><span class="lbl">+ Tải bài mới</span><span class="plus">+</span></button>
     ${link('home', 'Trang chủ')}
     ${streakCardHTML()}
     <a class="navlink ${r.id && String(r.id).startsWith('G_') ? 'on' : ''}" href="#/lesson/G_all/list" title="Ngữ pháp">${navIcon('grammar')}<span class="lbl">Ngữ pháp</span></a>
     ${r.id && String(r.id).startsWith('G_') ? weekNumbers().map(w => `<a class="lessonlink ${r.id === 'G_' + w ? 'on' : ''}" href="#/lesson/G_${w}/list">Tuần ${w}</a>`).join('') : ''}
-    ${link('notes', 'Sổ từ của tôi')}
-    ${link('stats', 'Thống kê')}
     ${link('vocab', 'Từ vựng')}
     ${(r.name === 'vocab' || (r.id && String(r.id).startsWith('V_'))) ? vocab.subjects.map(sj => `<a class="lessonlink ${(r.name === 'vocab' && String(r.subj) === String(sj.i)) || (r.id && String(r.id).startsWith('V_' + sj.i + '_')) ? 'on' : ''}" href="#/vocab/${sj.i}">${esc(sj.name)}</a>`).join('') : ''}
-    <div class="sec">BÀI HỌC</div>
-    <div class="lessonlist">${lessonLinks || '<div class="meta" style="padding:0 12px">Chưa có bài nào</div>'}</div>`;
+    ${link('notes', 'Sổ từ của tôi')}
+    ${link('stats', 'Thống kê')}
+`;
 }
 
 /* ============ TRANG CHỦ: TẢI BÀI + CHỌN NỘI DUNG ============ */
@@ -1270,15 +1266,10 @@ const MODE_CARDS = [
   ['check', 'Kiểm tra', '#dfeafc', '#2f6fd0', 'Trắc nghiệm · đúng/sai · tự luận']
 ];
 function renderHome(main){
-  const userLessons = [...state.lessons].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   main.innerHTML = `<div class="hhead"><div class="hicon">${svgIcon('spark', 30)}</div>
       <div><h1>Trang chủ</h1><p class="sub">Chọn một thư mục (môn học) để xem các tuần.</p></div></div>
     <h3 class="step">Thư mục từ vựng</h3>
-    ${folderGridHTML()}
-    ${userLessons.length ? `<h3 class="step">Bài học đã tải</h3><div class="rgrid">${userLessons.map(l => `<a class="rcard" href="#/lesson/${l.id}/overview">
-      <div class="row between"><strong>${esc(l.name)}</strong><span class="badge">${esc(l.folder)}</span></div>
-      <div class="meta" style="margin:6px 0 10px">${l.words.length} từ · đã học ${lessonPct(l)}%</div>
-      <div class="track"><div class="fill ok" style="width:${lessonPct(l)}%"></div></div></a>`).join('')}</div>` : ''}`;
+    ${folderGridHTML()}`;
 }
 function renderNew(main){
   const d = newDraft();
