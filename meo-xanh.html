@@ -2394,9 +2394,16 @@ function quizView(l){
   }
   return `<div class="card">${head}${body}${saved}${next}</div>`;
 }
+// Mọi từ đang có: bài tải lên, từ vựng và ngữ pháp lấy từ sheet
+function allWords(){
+  const vocabWords = vocab.subjects.flatMap(sj => Object.entries(sj.weeks).flatMap(([w, list]) =>
+    list.map((x, i) => ({id: `v${sj.i}_${w}_${i}`, ko: x.ko, vi: x.vi}))));
+  const grammarWords = grammarItems().map(x => ({id: 'g' + x.i, ko: x.ko, vi: x.vi}));
+  return [...state.lessons.flatMap(l => l.words), ...vocabWords, ...grammarWords];
+}
 function makeOptions(w, own){
   const others = shuffle(own.filter(x => x.id !== w.id))
-    .concat(shuffle(state.lessons.flatMap(l => l.words).filter(x => x.vi && x.id !== w.id && !own.includes(x))));
+    .concat(shuffle(allWords().filter(x => x.vi && x.id !== w.id && !own.includes(x))));
   const opts = [w];
   const seen = new Set([w.vi]);
   for(const x of others){
@@ -2412,7 +2419,7 @@ function startQuiz(){
   const types = ['mc', 'tf', 'essay'].filter(t => cfg[t]);
   if(!types.length){ toast('Chọn ít nhất một loại câu hỏi'); return; }
   const pool = l.words.filter(w => w.vi && (!ui.onlyUnknown || lvl(w.id) < 2));
-  const all = state.lessons.flatMap(x => x.words).filter(w => w.vi);
+  const all = allWords().filter(w => w.vi);
   if(!pool.length){ toast('Không còn từ nào để làm'); return; }
   if(types.includes('mc') && all.length < 4 && types.length === 1){ toast('Cần ít nhất 4 từ có nghĩa để làm câu ABCD'); return; }
   const n = l.quizCount || 0;
