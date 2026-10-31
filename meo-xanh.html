@@ -805,7 +805,8 @@ const ui = {
   fl: null, wId: null, wRes: null, sId: null, sRes: null, eId: null, eRes: null,
   quiz: null, ovPage: 1, ovQuery: '', listPage: 1, notesFilter: 'all', noteQuery: '', noteTab: 'word',
   draft: null, fileUrl: null, attachId: null,
-  curKey: null, resumeAsk: {}, flPos: {}, wDone: {}
+  curKey: null, resumeAsk: {}, flPos: {}, wDone: {},
+  autoSpeak: (() => { try{ return localStorage.getItem('meo-xanh-speak') !== '0'; }catch(e){ return true; } })()
 };
 
 function load(){
@@ -1950,6 +1951,7 @@ function flashBody(items, title){
   const dirBar = `<div class="chips">
     <button class="chip ${ui.dir === 'ko-vi' ? 'on' : ''}" data-act="dir" data-v="ko-vi">Từ → Nghĩa</button>
     <button class="chip ${ui.dir === 'vi-ko' ? 'on' : ''}" data-act="dir" data-v="vi-ko">Nghĩa → Từ</button>
+    <button class="chip ${ui.autoSpeak ? 'on' : ''}" data-act="autoSpeak">${svgIcon('speak', 16)} Tự đọc: ${ui.autoSpeak ? 'Bật' : 'Tắt'}</button>
   </div>
   <label class="row" style="gap:8px;font-size:14px;cursor:pointer"><input type="checkbox" data-only ${ui.onlyUnknown ? 'checked' : ''}> Chỉ thẻ chưa nhớ</label>`;
   if(!ids.length){
@@ -1960,6 +1962,10 @@ function flashBody(items, title){
   ui.flPos[key] = ui.fl.i;
   const cur = byId.get(ids[ui.fl.i]);
   const w = cur.w;
+  if(ui.autoSpeak && ui.fl.spoken !== w.id){
+    ui.fl.spoken = w.id;
+    speakKo(w.ko);
+  }
   const front = ui.dir === 'ko-vi' ? w.ko : (w.vi || '(chưa có nghĩa)');
   const back = ui.dir === 'ko-vi' ? (w.vi || '(chưa có nghĩa trong file)') : w.ko;
   const counts = [0, 1, 2].map(v => ids.filter(id => lvl(id) === v).length);
@@ -3041,6 +3047,13 @@ function act(name, d){
     case 'lv': flashLevel(+d.v); break;
     case 'flip': ui.fl.flipped = !ui.fl.flipped; render(); break;
     case 'speak': speakKo(d.v); break;
+    case 'autoSpeak': {
+      ui.autoSpeak = !ui.autoSpeak;
+      try{ localStorage.setItem('meo-xanh-speak', ui.autoSpeak ? '1' : '0'); }catch(e){}
+      if(!ui.autoSpeak && 'speechSynthesis' in window) speechSynthesis.cancel();
+      render();
+      break;
+    }
     case 'prev': flashStep(-1); break;
     case 'next': flashStep(1); break;
     case 'shuffle': ui.fl.ids = shuffle(ui.fl.ids); ui.fl.i = 0; ui.fl.flipped = false; render(); break;
