@@ -475,11 +475,11 @@
   .gp.p2{right:70px;bottom:24px;color:#a8701a;background:#fdf3cf}
   .gtool{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .glegend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
-  .glegend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
-  .glegend i.ex{background:#9fd9bd}
-  .glegend i.note{background:#f7b98a}
-  .glegend i.ext{background:#f2d978}
-  .glegend i.cmp{background:#a9c3f0}
+  .glegend .gdot{display:inline-block;flex:none;width:10px;height:10px;min-width:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .glegend .gd-ex{background:#9fd9bd}
+  .glegend .gd-note{background:#f7b98a}
+  .glegend .gd-ext{background:#f2d978}
+  .glegend .gd-cmp{background:#a9c3f0}
   .gsearch{flex:1;max-width:360px;min-width:200px;padding:12px 16px;border-radius:999px;border:1px solid #e3e8e6;background:#fff;font:inherit}
   .gwrap{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}
   .gindex{position:sticky;top:16px;background:#fff;border-radius:24px;padding:16px;display:grid;gap:4px}
@@ -1174,7 +1174,7 @@ function grammarListView(l){
     </section>`;
   }).join('');
   return `<div class="gtool">
-      <div class="glegend"><span><i class="ex"></i>Ví dụ</span><span><i class="note"></i>Chú ý</span><span><i class="ext"></i>Mở rộng</span><span><i class="cmp"></i>So sánh</span></div>
+      <div class="glegend"><span><i class="gdot gd-ex"></i>Ví dụ</span><span><i class="gdot gd-note"></i>Chú ý</span><span><i class="gdot gd-ext"></i>Mở rộng</span><span><i class="gdot gd-cmp"></i>So sánh</span></div>
       <input class="gsearch" type="search" placeholder="Tìm ngữ pháp…" oninput="gFilter(this.value)">
       <button class="ghost" data-act="gRefresh" title="${esc(grammarStatus())}">Cập nhật từ sheet</button>
     </div>
