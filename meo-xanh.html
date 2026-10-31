@@ -490,6 +490,10 @@
   .glist{min-width:0}
   .gitem{background:#fff;border-radius:28px;padding:22px;margin-bottom:16px;box-shadow:0 1px 0 #eef1f0}
   .gitem[hidden]{display:none}
+  .fw{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+  .fb{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+  .spk{width:40px;height:40px;min-height:0;padding:0;border-radius:50%;display:inline-grid;place-items:center;background:#fff;color:var(--teal-d);border:1px solid var(--line);box-shadow:none;flex:none}
+  .spk:hover{background:#e6f5f0}
   .resume{text-align:center;display:grid;gap:10px;justify-items:center;padding:28px}
   .resume p{margin:0;color:var(--muted)}
   .gihead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -1663,6 +1667,7 @@ const ICON = {
   keys: '<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 11h.01M10 11h.01M13 11h.01M16 11h.01M8 14h8"/>',
   pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>',
   flame: '<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2.5-4.5.5 2 1.5 3 2 3.5C11.5 9.5 11.8 6 12 3z"/>',
+  speak: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>',
   bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6h5.4c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/>',
   check: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6M8.5 12l2.5 2.5L16 10"/>',
   grid: '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
@@ -1923,6 +1928,16 @@ function bindOverview(l){
 }
 
 /* ============ THẺ HỌC (dùng cho bài và Ôn tập) ============ */
+// Nút loa cạnh chữ tiếng Hàn trên thẻ
+const speakBtn = text => `<button class="spk" data-act="speak" data-v="${esc(text)}" aria-label="Phát âm">${svgIcon('speak', 20)}</button>`;
+function speakKo(text){
+  if(!('speechSynthesis' in window)){ toast('Trình duyệt này không hỗ trợ phát âm'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
 function flashBody(items, title){
   if(!items.length) return '<div class="card empty">Chưa có từ nào.</div>';
   const key = route().id + '|' + ui.onlyUnknown;
@@ -1956,8 +1971,8 @@ function flashBody(items, title){
     <div class="track"><div class="fill" style="width:${pctDone}%"></div></div>
     <div class="fcard" data-act="flip" role="button" tabindex="0" aria-label="Lật thẻ" style="margin-top:14px">
       <div class="eyebrow">${ui.dir === 'ko-vi' ? 'Từ vựng' : 'Nghĩa'} · ${esc(cur.l.name)}</div>
-      <div class="fw">${esc(front)}</div>
-      ${ui.fl.flipped ? `<div class="fb">${esc(back)}</div>` : ''}
+      <div class="fw">${esc(front)}${ui.dir === 'ko-vi' ? speakBtn(w.ko) : ''}</div>
+      ${ui.fl.flipped ? `<div class="fb">${esc(back)}${ui.dir === 'vi-ko' ? speakBtn(w.ko) : ''}</div>` : ''}
       <div class="hint">${ui.fl.flipped ? 'Bấm vào thẻ để ẩn đáp án' : 'Bấm vào thẻ để lật'}</div>
     </div>
     <div class="lvbtns">
@@ -3025,6 +3040,7 @@ function act(name, d){
     case 'createLesson': createLesson(); break;
     case 'lv': flashLevel(+d.v); break;
     case 'flip': ui.fl.flipped = !ui.fl.flipped; render(); break;
+    case 'speak': speakKo(d.v); break;
     case 'prev': flashStep(-1); break;
     case 'next': flashStep(1); break;
     case 'shuffle': ui.fl.ids = shuffle(ui.fl.ids); ui.fl.i = 0; ui.fl.flipped = false; render(); break;
